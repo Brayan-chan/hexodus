@@ -1,0 +1,520 @@
+/* Definición de Variables de Tema (Idéntica a socios.css e inventario.css) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+:root {
+    --color-rojo-principal: #FF3B3B;
+    /* Rojo vibrante del logo */
+    --color-azul-acento: #00BFFF;
+    /* Azul neón para acentos */
+    --color-fondo-oscuro: #101014;
+    /* Fondo oscuro principal */
+    --color-tarjeta-fondo: #1C1C20;
+    /* Color de tarjeta */
+    --color-texto-claro: #E0E0E0;
+    --color-texto-gris: #A0A0A0;
+    --color-exito: #4BB543;
+    --color-alerta: #FFD700;
+    --color-peligro: #FF0000;
+}
+
+/* Estilos Globales y Fondo (Idénticos a socios.css) */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-fondo-oscuro);
+    background-size: 40px 40px;
+    color: var(--color-texto-claro);
+    min-height: 100vh;
+    display: flex;
+}
+
+/* ================================================
+   SIDEBAR Y NAVEGACIÓN (IDÉNTICA A SOCIOS)
+   ================================================ */
+.sidebar {
+    background-color: var(--color-tarjeta-fondo);
+    border-right: 1px solid rgba(0, 191, 255, 0.1);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.nav-link {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.nav-link:hover {
+    background-color: rgba(0, 191, 255, 0.1);
+}
+
+.nav-activo {
+    background-color: rgba(255, 59, 59, 0.15);
+    color: var(--color-rojo-principal);
+    border-left: 4px solid var(--color-rojo-principal);
+    /* Borde rojo para item activo */
+}
+
+/* ================================================
+   HEADER Y CONTENEDORES PRINCIPALES (IDÉNTICOS A SOCIOS)
+   ================================================ */
+.contenido-principal {
+    background-color: var(--color-fondo-oscuro);
+}
+
+.encabezado-dashboard {
+    background-color: var(--color-fondo-oscuro);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.contenido-scrollable {
+    background-color: var(--color-fondo-oscuro);
+    min-height: calc(100vh - 80px);
+}
+
+/* ================================================
+   TARJETAS Y KPIs (IDÉNTICAS A SOCIOS)
+   ================================================ */
+.tarjeta, .tarjeta-kpi {
+    background-color: var(--color-tarjeta-fondo);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.tarjeta-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-rojo-principal), var(--color-azul-acento));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.tarjeta-kpi:hover::before {
+    transform: scaleX(1);
+}
+
+/* ================================================
+   ICONOS DE ESTADO (IDÉNTICOS A SOCIOS)
+   ================================================ */
+.icon-alerta-rojo {
+    filter: drop-shadow(0 0 4px rgba(255, 59, 59, 0.5));
+}
+
+.icon-alerta-azul {
+    filter: drop-shadow(0 0 4px rgba(0, 191, 255, 0.5));
+}
+
+.icon-alerta-verde {
+    filter: drop-shadow(0 0 4px rgba(75, 181, 67, 0.5));
+}
+
+.icon-alerta-amarillo {
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+}
+
+/* ================================================
+   INPUTS CON EFECTO NEON (IDÉNTICOS A SOCIOS)
+   ================================================ */
+.input-neon {
+    background-color: rgba(31, 41, 55, 0.8);
+    border: 2px solid #374151;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.input-neon:focus {
+    border-color: var(--color-azul-acento) !important;
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.5);
+    outline: none;
+}
+
+.input-neon::placeholder {
+    color: var(--color-texto-gris);
+}
+
+/* ================================================
+   BOTONES ESTILO HEXODUS (IDÉNTICOS A SOCIOS)
+   ================================================ */
+.btn-principal {
+    background-color: var(--color-rojo-principal);
+    box-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
+    transition: all 0.3s;
+    color: #FFFFFF;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-principal:hover {
+    background-color: #FF5A5A;
+    box-shadow: 0 0 20px rgba(255, 59, 59, 1);
+}
+
+.btn-secundario {
+    color: var(--color-azul-acento);
+    border: 1px solid var(--color-azul-acento);
+    transition: all 0.3s;
+    background: transparent;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-secundario:hover {
+    background-color: rgba(0, 191, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+}
+
+/* ================================================
+   TABLA RESPONSIVE CON EFECTOS (IDÉNTICA A SOCIOS)
+   ================================================ */
+.tabla-scroll {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-azul-acento) var(--color-tarjeta-fondo);
+}
+
+.tabla-scroll::-webkit-scrollbar {
+    height: 12px;
+    width: 12px;
+}
+
+.tabla-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, var(--color-rojo-principal), var(--color-azul-acento));
+    border-radius: 10px;
+    border: 2px solid var(--color-tarjeta-fondo);
+}
+
+.tabla-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.tabla-scroll::-webkit-scrollbar-corner {
+    background: var(--color-tarjeta-fondo);
+}
+
+/* Animaciones para filas de tabla */
+.tabla-scroll tbody tr {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mejores hover effects para botones de acción */
+.tabla-scroll tbody tr td button {
+    transition: all 0.2s ease-in-out;
+    border-radius: 0.375rem;
+}
+
+.tabla-scroll tbody tr td button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ================================================
+   ESTILOS ESPECÍFICOS PARA REPORTES
+   ================================================ */
+
+/* Estilos para tipos de reportes */
+.tipo-ventas {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22C55E;
+}
+
+.tipo-socios {
+    background-color: rgba(0, 191, 255, 0.2);
+    color: var(--color-azul-acento);
+}
+
+.tipo-inventario {
+    background-color: rgba(255, 165, 0, 0.2);
+    color: #FFA500;
+}
+
+.tipo-financiero {
+    background-color: rgba(255, 59, 59, 0.2);
+    color: var(--color-rojo-principal);
+}
+
+.tipo-operacional {
+    background-color: rgba(128, 0, 128, 0.2);
+    color: #9333EA;
+}
+
+.tipo-completo {
+    background-color: rgba(139, 69, 19, 0.2);
+    color: #D2691E;
+}
+
+/* Estilos para estados de reportes */
+.estado-generado {
+    background-color: rgba(75, 181, 67, 0.2);
+    color: #4BB543;
+}
+
+.estado-procesando {
+    background-color: rgba(255, 215, 0, 0.2);
+    color: #FFD700;
+}
+
+.estado-error {
+    background-color: rgba(255, 59, 59, 0.2);
+    color: var(--color-rojo-principal);
+}
+
+.estado-descargado {
+    background-color: rgba(0, 191, 255, 0.2);
+    color: var(--color-azul-acento);
+}
+
+/* Estilos para formatos de archivo */
+.formato-pdf {
+    background-color: rgba(220, 38, 127, 0.2);
+    color: #DC2677;
+}
+
+.formato-excel {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22C55E;
+}
+
+.formato-csv {
+    background-color: rgba(0, 191, 255, 0.2);
+    color: var(--color-azul-acento);
+}
+
+.formato-json {
+    background-color: rgba(255, 165, 0, 0.2);
+    color: #FFA500;
+}
+
+/* Responsive improvements específicos para reportes */
+@media (max-width: 768px) {
+    .tabla-scroll {
+        max-height: calc(100vh - 520px) !important;
+    }
+    
+    .tarjeta-kpi {
+        padding: 1rem;
+    }
+    
+    .tabla-scroll table {
+        min-width: 900px; /* Tabla más ancha para reportes */
+    }
+    
+    /* Ajustar el contenido scrollable en móviles */
+    .contenido-scrollable {
+        height: calc(100vh - 140px);
+    }
+}
+
+/* Mejoras para el modal de reportes */
+.modal-fondo {
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+.modal-contenido {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Animaciones específicas para reportes */
+.reporte-actualizado {
+    animation: highlightReport 2s ease-out;
+}
+
+@keyframes highlightReport {
+    0% {
+        background-color: rgba(0, 191, 255, 0.3);
+        transform: scale(1.02);
+    }
+    100% {
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+/* Estilos para notificaciones */
+.notificacion {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.notificacion.show {
+    transform: translateX(0);
+}
+
+.notificacion.success {
+    background-color: #4BB543;
+}
+
+.notificacion.error {
+    background-color: var(--color-rojo-principal);
+}
+
+.notificacion.warning {
+    background-color: #FFD700;
+    color: #000;
+}
+
+.notificacion.info {
+    background-color: var(--color-azul-acento);
+}
+
+/* Estilos específicos para progress bars de reportes */
+.progress-reporte {
+    height: 4px;
+    background-color: rgba(0, 191, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-reporte .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-rojo-principal), var(--color-azul-acento));
+    transition: width 0.3s ease;
+}
+
+/* Animación de carga para reportes */
+.loading-reporte {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loadingReport 1.5s infinite;
+}
+
+@keyframes loadingReport {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Mejores estilos para badges de estado */
+.estado-badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.estado-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.estado-badge:hover::before {
+    left: 100%;
+}
+
+/* Estilos para el header sticky en tablas */
+.tabla-scroll thead th {
+    position: sticky;
+    top: 0;
+    background-color: var(--color-tarjeta-fondo);
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejores estilos para paginación */
+#numeros-pagina-reportes button {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+#numeros-pagina-reportes button:hover {
+    transform: translateY(-2px);
+}
+
+#numeros-pagina-reportes button.active {
+    box-shadow: 0 4px 15px rgba(255, 59, 59, 0.4);
+}
+
+/* Animaciones para el loading de tabla */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Nuevas utilidades específicas para reportes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulse animation para notificaciones */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Glow effect para elementos activos */
+.glow-active {
+    box-shadow: 0 0 20px rgba(255, 59, 59, 0.3);
+    border: 1px solid rgba(255, 59, 59, 0.5);
+}
