@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexodus | Gestión de Usuarios</title>
+    <!-- Mostrar iconos de Hexodus -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icon.png" />
+    <!-- Carga de CSS para usuarios -->
+    <link rel="stylesheet" href="../assets/css/usuarios.css">
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de íconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- 1. BARRA LATERAL DE NAVEGACIÓN (IDÉNTICA AL DASHBOARD) -->
+        <aside class="sidebar fixed z-30 inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out p-4 flex flex-col justify-between">
+            <div class="space-y-6">
+                <!-- Logo Hexodus (Usando la estructura del Dashboard para el tamaño) -->
+                <div class="flex items-center space-x-3 mb-8">
+                    <!-- CONTENEDOR PARA IMAGEN DEL LOGO COMPLETO-->
+                    <div class="h-10 w-10 icon-alerta-rojo flex items-center justify-center">
+                        <img src="../assets/images/icon.png" alt="Logo Hexodus">
+                    </div>
+                    <!-- TEXTO HEXODUS (Ahora text-xl) -->
+                    <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);">HEXODUS</span>
+                </div>
+
+                <!-- Menú Principal (Nombres de módulos simplificados) -->
+                <nav class="space-y-2">
+                    <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+                        Dashboard
+                    </a>
+                    <a href="socios.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                        Gestión de Socios 
+                    </a>
+                    <a href="ventas.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
+                        Gestión de Ventas
+                    </a>
+                    <a href="inventario.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>
+                        Inventario y Productos
+                    </a>
+                    <a href="reportes.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
+                        Reportes
+                    </a>
+                    <!-- Item Activo: Usuarios -->
+                    <a href="#" class="nav-link nav-activo flex items-center p-3 rounded-lg text-sm font-medium">
+                        <i data-lucide="shield-check" class="w-5 h-5 mr-3"></i>
+                        Gestión de Usuarios
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Sección Inferior: Configuración -->
+            <div class="pb-4 border-t border-gray-800 pt-4">
+                 <a href="#" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                    <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+                    Configuración
+                </a>
+            </div>
+        </aside>
+
+        <!-- Overlay para móvil y botón de toggle (para responsividad) -->
+        <div id="backdrop" class="fixed inset-0 bg-black opacity-50 z-20 hidden md:hidden"></div>
+        <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg" style="background-color: var(--color-tarjeta-fondo);">
+            <i data-lucide="menu" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+        </button>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="contenido-principal flex-1 md:ml-64 flex flex-col">
+            <!-- ENCABEZADO SUPERIOR (IDÉNTICO AL DASHBOARD) -->
+            <header class="encabezado-dashboard flex items-center justify-between p-4 md:p-6 bg-gray-900 border-b border-gray-700 flex-shrink-0 z-20">
+                <h1 class="text-2xl font-bold" style="color: var(--color-azul-acento);">Gestión de Usuarios</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm hidden sm:block" id="fecha-hora-header">Admin. | 01/12/2025 | 10:30 AM</span>
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Notificaciones"></i>
+                    <i data-lucide="log-out" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Cerrar Sesión"></i>
+                </div>
+            </header>
+
+            <!-- CONTENIDO SCROLLABLE -->
+            <div class="contenido-scrollable overflow-y-auto flex-1 p-4 md:p-8 space-y-8">
+                
+            <!-- KPIs SUPERIORES DE USUARIOS -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI 1: Total Usuarios -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Total Usuarios</span>
+                        <i data-lucide="users" class="w-6 h-6 icon-alerta-azul"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">24</p>
+                    <span class="text-xs text-green-400 flex items-center"><i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +3 este mes</span>
+                </div>
+
+                <!-- KPI 2: Usuarios Activos -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-rojo-principal);">Usuarios Activos</span>
+                        <i data-lucide="user-check" class="w-6 h-6 icon-alerta-rojo"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">21</p>
+                    <span class="text-xs text-yellow-400">87.5% del total</span>
+                </div>
+
+                <!-- KPI 3: Administradores -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-rojo-principal);">Administradores</span>
+                        <i data-lucide="shield" class="w-6 h-6 icon-alerta-rojo"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">5</p>
+                    <span class="text-xs text-gray-400">Permisos completos</span>
+                </div>
+
+                <!-- KPI 4: Último Acceso -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Último Acceso</span>
+                        <i data-lucide="clock" class="w-6 h-6 icon-alerta-azul"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">2m</p>
+                    <span class="text-xs text-green-400">Hace 2 minutos</span>
+                </div>
+            </section>
+
+            <!-- CONTENIDO DE GESTIÓN DE USUARIOS -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                <!-- COLUMNA 1: FILTROS Y AGREGAR USUARIO (1/4 del ancho) -->
+                <div class="lg:col-span-1 space-y-6">
+
+                    <!-- MÓDULO DE ACCIÓN PRINCIPAL: NUEVO USUARIO -->
+                    <div class="tarjeta p-6 flex flex-col items-center">
+                        <i data-lucide="user-plus" class="w-12 h-12 mb-4" style="color: var(--color-rojo-principal);"></i>
+                        <h2 class="text-xl font-semibold mb-4">Nuevo Usuario</h2>
+                        <p class="text-sm text-center mb-4 text-gray-400">Agrega un nuevo usuario al sistema con permisos específicos.</p>
+                        <button id="btn-agregar-usuario" class="btn-principal w-full py-3 font-bold rounded-lg uppercase transition duration-300">
+                            <span class="flex items-center justify-center"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Agregar Usuario</span>
+                        </button>
+                    </div>
+
+                    <!-- MÓDULO DE FILTROS Y CONFIGURACIÓN -->
+                    <div class="tarjeta p-6">
+                        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-azul-acento);">Filtros de Usuarios</h2>
+
+                        <!-- Filtro por Estado -->
+                        <div class="mb-4">
+                            <label for="estado-filtro" class="block text-sm font-medium mb-2 text-gray-400">Estado del Usuario</label>
+                            <select id="estado-filtro"
+                                    class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                <option value="todos">🔍 Todos los Estados</option>
+                                <option value="activo">✅ Usuarios Activos</option>
+                                <option value="inactivo">❌ Usuarios Inactivos</option>
+                                <option value="bloqueado">🚫 Usuarios Bloqueados</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Rol -->
+                        <div class="mb-4">
+                            <label for="rol-filtro" class="block text-sm font-medium mb-2 text-gray-400">Rol del Usuario</label>
+                            <select id="rol-filtro"
+                                    class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                <option value="todos">👥 Todos los Roles</option>
+                                <option value="admin">🛡️ Administrador</option>
+                                <option value="moderador">⚖️ Moderador</option>
+                                <option value="empleado">👤 Empleado</option>
+                                <option value="invitado">👁️ Invitado</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Departamento -->
+                        <div class="mb-4">
+                            <label for="departamento-filtro" class="block text-sm font-medium mb-2 text-gray-400">Departamento</label>
+                            <select id="departamento-filtro"
+                                    class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                <option value="todos">🏢 Todos los Departamentos</option>
+                                <option value="administracion">🏛️ Administración</option>
+                                <option value="ventas">💼 Ventas</option>
+                                <option value="operaciones">⚙️ Operaciones</option>
+                                <option value="marketing">📢 Marketing</option>
+                                <option value="soporte">🎧 Soporte</option>
+                            </select>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="space-y-2">
+                            <button id="btn-aplicar-filtros-usuarios" class="btn-secundario w-full py-3 font-medium rounded-lg uppercase transition duration-300">
+                                <i data-lucide="filter" class="w-4 h-4 mr-2 inline"></i>Aplicar Filtros
+                            </button>
+                            <button id="btn-restablecer-filtros" class="w-full py-2 text-sm font-medium text-gray-400 hover:text-white transition duration-300">
+                                <i data-lucide="refresh-cw" class="w-4 h-4 mr-2 inline"></i>Restablecer
+                            </button>
+                        </div>
+
+                        <!-- Estado de Sesiones Activas -->
+                        <div class="mt-6 pt-4 border-t border-gray-700">
+                            <h4 class="text-sm font-semibold text-gray-400 mb-3 flex items-center">
+                                <i data-lucide="activity" class="w-4 h-4 mr-2" style="color: var(--color-azul-acento);"></i>
+                                Sesiones Activas
+                            </h4>
+                            <div id="sesiones-activas" class="space-y-2 text-xs">
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="text-gray-400">Administradores</span>
+                                    <span class="text-green-400 font-semibold">3 online</span>
+                                </div>
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="text-gray-400">Empleados</span>
+                                    <span class="text-yellow-400 font-semibold">8 online</span>
+                                </div>
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="text-gray-400">Total</span>
+                                    <span class="text-blue-400 font-semibold">11/24</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- COLUMNA 2: TABLA DE USUARIOS Y GESTIÓN (3/4 del ancho) -->
+                <div class="lg:col-span-3">
+                    <div class="tarjeta p-6">
+                        <!-- Header con controles -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                            <div class="flex items-center mb-4 sm:mb-0">
+                                <i data-lucide="shield-check" class="w-6 h-6 mr-2" style="color: var(--color-azul-acento);"></i>
+                                <h2 class="text-xl font-semibold">Lista de Usuarios</h2>
+                                <span class="ml-2 px-3 py-1 text-xs font-semibold rounded-full" style="background-color: rgba(0, 191, 255, 0.2); color: var(--color-azul-acento);" id="total-usuarios">24 usuarios</span>
+                            </div>
+                            
+                            <!-- Controles de vista -->
+                            <div class="flex items-center space-x-2">
+                                <label for="registros-por-pagina-usuarios" class="text-sm text-gray-400">Mostrar:</label>
+                                <select id="registros-por-pagina-usuarios" class="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm">
+                                    <option value="10">10</option>
+                                    <option value="25" selected>25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="text-sm text-gray-400">por página</span>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor de la Tabla con Scroll Mejorado -->
+                        <div class="overflow-x-auto tabla-scroll rounded-lg" style="max-height: calc(100vh - 480px);">
+                            <table class="min-w-full divide-y divide-gray-700">
+                                <thead class="bg-gray-700 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300 cursor-pointer hover:bg-gray-600 transition duration-200 sticky top-0 bg-gray-700">
+                                            <div class="flex items-center space-x-1">
+                                                <span>ID / Usuario</span>
+                                                <i data-lucide="chevrons-up-down" class="w-3 h-3"></i>
+                                            </div>
+                                        </th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300 cursor-pointer hover:bg-gray-600 transition duration-200">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Información</span>
+                                                <i data-lucide="chevrons-up-down" class="w-3 h-3"></i>
+                                            </div>
+                                        </th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Rol</th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Departamento</th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300 cursor-pointer hover:bg-gray-600 transition duration-200">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Estado</span>
+                                                <i data-lucide="chevrons-up-down" class="w-3 h-3"></i>
+                                            </div>
+                                        </th>
+                                        <th class="px-4 py-4 text-center text-xs font-medium uppercase tracking-wider text-gray-300">Último Acceso</th>
+                                        <th class="px-4 py-4 text-center text-xs font-medium uppercase tracking-wider text-gray-300">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-800" id="tabla-usuarios-body">
+                                    <!-- Contenido dinámico generado por JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Footer de Paginación (idéntico a socios e inventario) -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-6 pt-4 border-t border-gray-700">
+                            <!-- Información de registros -->
+                            <div class="text-sm text-gray-400 mb-4 sm:mb-0">
+                                Mostrando 
+                                <span id="registros-inicio-usuarios" class="font-semibold">1</span>
+                                -
+                                <span id="registros-fin-usuarios" class="font-semibold">24</span>
+                                de 
+                                <span id="total-registros-usuarios" class="font-semibold">24</span>
+                                usuarios
+                            </div>
+                            
+                            <!-- Controles de paginación -->
+                            <div class="flex items-center space-x-2">
+                                <button id="btn-primera-pagina-usuarios" class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded hover:text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btn-pagina-anterior-usuarios" class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded hover:text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                
+                                <div id="numeros-pagina-usuarios" class="flex space-x-1">
+                                    <!-- Números de página dinámicos -->
+                                </div>
+                                
+                                <button id="btn-pagina-siguiente-usuarios" class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded hover:text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btn-ultima-pagina-usuarios" class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded hover:text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL PARA GESTIÓN DE USUARIO -->
+    <div id="modal-usuario" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- Header del modal -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-700">
+                <h3 class="text-lg font-semibold text-white" id="titulo-modal-usuario">Agregar Nuevo Usuario</h3>
+                <button id="btn-cerrar-modal-usuario" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <!-- Cuerpo del modal -->
+            <form id="form-usuario" class="p-6 space-y-6">
+                <!-- SECCIÓN 1: INFORMACIÓN PERSONAL -->
+                <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center">
+                    <i data-lucide="user" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> Información Personal
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="nombre-usuario" class="block text-sm font-medium mb-1 text-gray-400">Nombre Completo <span class="text-red-500">*</span></label>
+                        <input type="text" id="nombre-usuario" name="nombre-usuario" required
+                               class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                    </div>
+                    <div>
+                        <label for="email-usuario" class="block text-sm font-medium mb-1 text-gray-400">Correo Electrónico <span class="text-red-500">*</span></label>
+                        <input type="email" id="email-usuario" name="email-usuario" required
+                               class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                    </div>
+                    <div>
+                        <label for="telefono-usuario" class="block text-sm font-medium mb-1 text-gray-400">Teléfono</label>
+                        <input type="tel" id="telefono-usuario" name="telefono-usuario"
+                               class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                    </div>
+                    <div>
+                        <label for="username-usuario" class="block text-sm font-medium mb-1 text-gray-400">Nombre de Usuario <span class="text-red-500">*</span></label>
+                        <input type="text" id="username-usuario" name="username-usuario" required
+                               class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: CONFIGURACIÓN DE ACCESO -->
+                <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center">
+                    <i data-lucide="shield" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> Configuración de Acceso
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label for="rol-usuario" class="block text-sm font-medium mb-1 text-gray-400">Rol <span class="text-red-500">*</span></label>
+                        <select id="rol-usuario" name="rol-usuario" required
+                                class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                            <option value="">Seleccionar rol...</option>
+                            <option value="admin">🛡️ Administrador</option>
+                            <option value="moderador">⚖️ Moderador</option>
+                            <option value="empleado">👤 Empleado</option>
+                            <option value="invitado">👁️ Invitado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="departamento-usuario" class="block text-sm font-medium mb-1 text-gray-400">Departamento <span class="text-red-500">*</span></label>
+                        <select id="departamento-usuario" name="departamento-usuario" required
+                                class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                            <option value="">Seleccionar departamento...</option>
+                            <option value="administracion">🏛️ Administración</option>
+                            <option value="ventas">💼 Ventas</option>
+                            <option value="operaciones">⚙️ Operaciones</option>
+                            <option value="marketing">📢 Marketing</option>
+                            <option value="soporte">🎧 Soporte</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="estado-usuario" class="block text-sm font-medium mb-1 text-gray-400">Estado <span class="text-red-500">*</span></label>
+                        <select id="estado-usuario" name="estado-usuario" required
+                                class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                            <option value="activo">✅ Activo</option>
+                            <option value="inactivo">❌ Inactivo</option>
+                            <option value="bloqueado">🚫 Bloqueado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: CONTRASEÑA (Solo para nuevos usuarios) -->
+                <div id="seccion-password">
+                    <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center">
+                        <i data-lucide="key" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> Contraseña
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label for="password-usuario" class="block text-sm font-medium mb-1 text-gray-400">Contraseña <span class="text-red-500">*</span></label>
+                            <input type="password" id="password-usuario" name="password-usuario"
+                                   class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                        </div>
+                        <div>
+                            <label for="confirmar-password" class="block text-sm font-medium mb-1 text-gray-400">Confirmar Contraseña <span class="text-red-500">*</span></label>
+                            <input type="password" id="confirmar-password" name="confirmar-password"
+                                   class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 4: PERMISOS -->
+                <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center">
+                    <i data-lucide="settings" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> Permisos Específicos
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="perm-usuarios" name="permisos" value="usuarios"
+                                   class="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-0">
+                            <label for="perm-usuarios" class="ml-2 text-sm text-gray-400">Gestión de usuarios</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="perm-socios" name="permisos" value="socios"
+                                   class="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-0">
+                            <label for="perm-socios" class="ml-2 text-sm text-gray-400">Gestión de socios</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="perm-ventas" name="permisos" value="ventas"
+                                   class="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-0">
+                            <label for="perm-ventas" class="ml-2 text-sm text-gray-400">Gestión de ventas</label>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="perm-inventario" name="permisos" value="inventario"
+                                   class="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-0">
+                            <label for="perm-inventario" class="ml-2 text-sm text-gray-400">Gestión de inventario</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="perm-reportes" name="permisos" value="reportes"
+                                   class="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-0">
+                            <label for="perm-reportes" class="ml-2 text-sm text-gray-400">Generar reportes</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="perm-configuracion" name="permisos" value="configuracion"
+                                   class="rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-0">
+                            <label for="perm-configuracion" class="ml-2 text-sm text-gray-400">Configuración del sistema</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-700">
+                    <button type="button" id="btn-cancelar-usuario" class="btn-secundario px-6 py-2 rounded-lg font-bold uppercase">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btn-guardar-usuario" class="btn-principal px-6 py-2 rounded-lg font-bold uppercase">
+                        GUARDAR USUARIO
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../assets/js/usuarios.js"></script>
+</body>
+</html>
