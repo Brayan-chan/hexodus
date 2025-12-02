@@ -1,0 +1,93 @@
+LICENCIA PROPIETARIA HEXODUS
+
+Copyright © 2025 Brayan Chan (Brayan-chan) - Hexodus Gym Management System
+
+TÉRMINOS Y CONDICIONES DE USO
+
+IMPORTANTE: LEA ESTOS TÉRMINOS Y CONDICIONES CUIDADOSAMENTE ANTES DE USAR ESTE SOFTWARE.
+
+1. DERECHOS DE AUTOR
+   Este software y toda la documentación asociada ("Software") son propiedad exclusiva de
+   Brayan Chan y están protegidos por las leyes de derechos de autor y tratados
+   internacionales. Todos los derechos están reservados.
+
+2. CONCESIÓN DE LICENCIA
+   Se le otorga una licencia limitada, no exclusiva, intransferible y revocable para:
+   - Usar el Software únicamente para las operaciones internas de Hexodus Gym
+   - Instalar el Software en los equipos necesarios para el funcionamiento del negocio
+   - Realizar copias de seguridad del Software para fines de preservación
+
+3. RESTRICCIONES
+   Usted NO puede:
+   - Distribuir, sublicenciar, vender, arrendar o transferir el Software
+   - Modificar, alterar, descompilar, desensamblar o realizar ingeniería inversa del Software
+   - Usar el Software para fines comerciales externos a Hexodus Gym
+   - Crear trabajos derivados basados en el Software
+   - Remover o alterar cualquier aviso de derechos de autor o marca comercial
+
+4. USO AUTORIZADO
+   El Software está destinado exclusivamente para:
+   - Gestión de socios y membresías de Hexodus Gym
+   - Control de inventario y productos del gimnasio
+   - Administración de ventas y transacciones
+   - Generación de reportes y análisis internos
+   - Configuración y administración del sistema del gimnasio
+
+5. PROPIEDAD INTELECTUAL
+   - Todos los derechos de propiedad intelectual permanecen con el autor
+   - La marca "Hexodus" y todos los elementos visuales son propiedad del autor
+   - Los iconos, diseños y elementos gráficos son de uso exclusivo para este proyecto
+
+6. CONFIDENCIALIDAD
+   El Software contiene información confidencial y propietaria. Usted se compromete a:
+   - Mantener la confidencialidad del código fuente y arquitectura
+   - No revelar información técnica a terceros
+   - Proteger el Software con medidas de seguridad apropiadas
+
+7. LIMITACIÓN DE GARANTÍA
+   EL SOFTWARE SE PROPORCIONA "TAL COMO ESTÁ", SIN GARANTÍAS DE NINGÚN TIPO,
+   EXPRESAS O IMPLÍCITAS, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE
+   COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN.
+
+8. LIMITACIÓN DE RESPONSABILIDAD
+   EN NINGÚN CASO EL AUTOR SERÁ RESPONSABLE POR DAÑOS DIRECTOS, INDIRECTOS,
+   INCIDENTALES, ESPECIALES, EJEMPLARES O CONSECUENCIALES (INCLUYENDO, PERO NO
+   LIMITADO A, PÉRDIDA DE DATOS, INTERRUPCIÓN DEL NEGOCIO O PÉRDIDA DE GANANCIAS)
+   DERIVADOS DEL USO O LA IMPOSIBILIDAD DE USAR EL SOFTWARE.
+
+9. TECNOLOGÍAS DE TERCEROS
+   Este Software utiliza las siguientes tecnologías de terceros con sus respectivas licencias:
+   - Tailwind CSS (MIT License)
+   - Chart.js (MIT License)
+   - Lucide Icons (ISC License)
+   - Google Fonts (SIL Open Font License)
+
+10. TERMINACIÓN
+    Esta licencia es efectiva hasta que sea terminada. Sus derechos bajo esta licencia
+    terminarán automáticamente sin aviso del autor si usted incumple cualquiera de estos
+    términos. Al terminar, debe cesar todo uso del Software y destruir todas las copias.
+
+11. LEY APLICABLE
+    Esta licencia se rige por las leyes de México. Cualquier disputa relacionada con esta
+    licencia será sometida a la jurisdicción exclusiva de los tribunales mexicanos.
+
+12. CONTACTO
+    Para consultas sobre esta licencia o permisos adicionales:
+    - Email: chanpachecob@gmail.com
+    - GitHub: https://github.com/Brayan-chan/hexodus
+
+13. RECONOCIMIENTOS
+    Desarrollado con tecnologías modernas para proporcionar una solución integral
+    de gestión para gimnasios. Diseñado específicamente para las necesidades
+    operativas de Hexodus Gym.
+
+ÚLTIMA ACTUALIZACIÓN: 2 de diciembre de 2025
+
+AL USAR ESTE SOFTWARE, USTED ACEPTA ESTAR VINCULADO POR LOS TÉRMINOS Y CONDICIONES
+DE ESTA LICENCIA. SI NO ESTÁ DE ACUERDO CON ESTOS TÉRMINOS, NO USE EL SOFTWARE.
+
+---
+
+Hexodus Gym Management System v1.0
+Desarrollado por Brayan Chan © 2025
+Todos los derechos reservados.
