@@ -6,6 +6,8 @@
     <title>Hexodus | Iniciar Sesión</title>
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icon.png" />
+    <!-- Carga de configuración global -->
+    <script src="assets/js/global-config.js"></script>
     <!-- Carga de CSS para el login -->
     <link rel="stylesheet" href="assets/css/login.css">
     <!-- Carga de Tailwind CSS -->
@@ -16,10 +18,10 @@
     <!-- Tarjeta de Formulario Flotante -->
     <div class="w-full max-w-md p-8 sm:p-10 bg-gray-800 rounded-2xl card-glow transform transition-all duration-300">
         
-        <!-- Logo (Imagen del logo Hexodus) -->
+        <!-- Logo (Imagen del logo del Sistema) -->
         <div class="flex justify-center mb-6">
-            <!-- Usando la imagen subida por el usuario para el logo -->
-            <img src="assets/images/icon.png" alt="Logo de Hexodus" class="h-16 w-16" />
+            <!-- Logo personalizable del sistema -->
+            <img src="assets/images/icon.png" alt="Logo del Sistema" class="h-16 w-16" data-system-logo />
         </div>
 
         <!-- Título -->
