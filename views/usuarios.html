@@ -7,6 +7,8 @@
     <!-- Mostrar iconos de Hexodus -->
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icon.png" />
+    <!-- Carga de configuración global -->
+    <script src="../assets/js/global-config.js"></script>
     <!-- Carga de CSS para usuarios -->
     <link rel="stylesheet" href="../assets/css/usuarios.css">
     <!-- Carga de Tailwind CSS -->
@@ -24,10 +26,10 @@
                 <div class="flex items-center space-x-3 mb-8">
                     <!-- CONTENEDOR PARA IMAGEN DEL LOGO COMPLETO-->
                     <div class="h-10 w-10 icon-alerta-rojo flex items-center justify-center">
-                        <img src="../assets/images/icon.png" alt="Logo Hexodus">
+                        <img src="../assets/images/icon.png" alt="Logo Sistema" data-system-logo id="sidebar-logo-img">
                     </div>
-                    <!-- TEXTO HEXODUS (Ahora text-xl) -->
-                    <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);">HEXODUS</span>
+                    <!-- TEXTO DEL SISTEMA -->
+                    <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);" data-system-name id="sidebar-logo-text">HEXODUS</span>
                 </div>
 
                 <!-- Menú Principal (Nombres de módulos simplificados) -->
@@ -62,7 +64,7 @@
 
             <!-- Sección Inferior: Configuración -->
             <div class="pb-4 border-t border-gray-800 pt-4">
-                 <a href="#" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                 <a href="settings.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
                     <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
                     Configuración
                 </a>
