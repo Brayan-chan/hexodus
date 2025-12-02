@@ -7,6 +7,8 @@
     <!-- Mostrar iconos de Hexodus -->
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icon.png" />
+    <!-- Carga de configuración global -->
+    <script src="../assets/js/global-config.js"></script>
     <!-- Carga de CSS para el dashboard -->
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <!-- Carga de Tailwind CSS -->
@@ -23,8 +25,8 @@
         <div class="space-y-6">
             <!-- Logo del Dashboard -->
             <div class="flex items-center space-x-3 mb-8">
-                <img src="../assets/images/icon.png" alt="Logo Hexodus" class="h-10 w-10 icon-alerta-rojo" />
-                <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);">Hexodus</span>
+                <img src="../assets/images/icon.png" alt="Logo Sistema" class="h-10 w-10 icon-alerta-rojo" data-system-logo id="sidebar-logo-img" />
+                <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);" data-system-name id="sidebar-logo-text">Hexodus</span>
             </div>
 
             <!-- Menú Principal -->
@@ -58,7 +60,7 @@
 
         <!-- Enlace de Configuración (RF21) -->
         <div class="pb-4 border-t border-gray-800 pt-4">
-             <a href="#" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+             <a href="settings.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
                 <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
                 Configuración 
             </a>
