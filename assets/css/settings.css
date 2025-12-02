@@ -1,0 +1,620 @@
+/* Definición de Variables de Tema (Reutilizando desde el patrón establecido) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+:root {
+    --color-rojo-principal: #FF3B3B;
+    /* Rojo vibrante del logo */
+    --color-azul-acento: #00BFFF;
+    /* Azul neón para acentos */
+    --color-fondo-oscuro: #101014;
+    /* Fondo oscuro principal */
+    --color-tarjeta-fondo: #1C1C20;
+    /* Color de tarjeta */
+    --color-texto-claro: #E0E0E0;
+    --color-texto-gris: #A0A0A0;
+    --color-exito: #4BB543;
+    --color-alerta: #FFD700;
+    --color-peligro: #FF0000;
+}
+
+/* Estilos Globales y Fondo (Idéntico a otros módulos) */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-fondo-oscuro);
+    background-size: 40px 40px;
+    color: var(--color-texto-claro);
+    min-height: 100vh;
+    display: flex;
+}
+
+/* ================================================
+   SIDEBAR Y NAVEGACIÓN (IDÉNTICA A OTROS MÓDULOS)
+   ================================================ */
+.sidebar {
+    background-color: var(--color-tarjeta-fondo);
+    border-right: 1px solid rgba(0, 191, 255, 0.1);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.nav-link {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.nav-link:hover {
+    background-color: rgba(0, 191, 255, 0.1);
+}
+
+.nav-activo {
+    background-color: rgba(255, 59, 59, 0.15);
+    color: var(--color-rojo-principal);
+    border-left: 4px solid var(--color-rojo-principal);
+}
+
+/* ================================================
+   HEADER Y CONTENEDORES PRINCIPALES (IDÉNTICOS)
+   ================================================ */
+.contenido-principal {
+    background-color: var(--color-fondo-oscuro);
+}
+
+.encabezado-dashboard {
+    background-color: var(--color-fondo-oscuro);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.contenido-scrollable {
+    background: linear-gradient(135deg, rgba(16, 16, 20, 0.8), rgba(28, 28, 32, 0.8));
+}
+
+/* ================================================
+   TARJETAS Y KPIs (IDÉNTICAS A OTROS MÓDULOS)
+   ================================================ */
+.tarjeta, .tarjeta-kpi {
+    background-color: var(--color-tarjeta-fondo);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.tarjeta-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-rojo-principal), var(--color-azul-acento));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.tarjeta-kpi:hover::before {
+    transform: scaleX(1);
+}
+
+/* ================================================
+   ICONOS DE ESTADO (IDÉNTICOS)
+   ================================================ */
+.icon-alerta-rojo {
+    filter: drop-shadow(0 0 5px rgba(255, 59, 59, 0.7));
+}
+
+.icon-alerta-azul {
+    filter: drop-shadow(0 0 5px rgba(0, 191, 255, 0.7));
+    color: var(--color-azul-acento);
+}
+
+/* ================================================
+   INPUTS CON EFECTO NEON (IDÉNTICOS)
+   ================================================ */
+.input-neon {
+    background-color: rgba(31, 41, 55, 0.8);
+    border: 2px solid #374151;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.input-neon:focus {
+    border-color: var(--color-azul-acento) !important;
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.5);
+    outline: none;
+}
+
+.input-neon::placeholder {
+    color: var(--color-texto-gris);
+}
+
+/* ================================================
+   BOTONES ESTILO HEXODUS (IDÉNTICOS)
+   ================================================ */
+.btn-principal {
+    background-color: var(--color-rojo-principal);
+    box-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
+    transition: all 0.3s;
+    color: #FFFFFF;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-principal:hover {
+    background-color: #FF5A5A;
+    box-shadow: 0 0 20px rgba(255, 59, 59, 1);
+}
+
+.btn-secundario {
+    color: var(--color-azul-acento);
+    border: 1px solid var(--color-azul-acento);
+    transition: all 0.3s;
+    background: transparent;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-secundario:hover {
+    background-color: rgba(0, 191, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+}
+
+/* ================================================
+   ESTILOS ESPECÍFICOS PARA CONFIGURACIÓN
+   ================================================ */
+
+/* Toggle Switch personalizado con tema Hexodus */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #374151;
+    transition: 0.3s;
+    border-radius: 24px;
+    border: 1px solid #4B5563;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 2px;
+    background-color: #9CA3AF;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background: linear-gradient(45deg, var(--color-rojo-principal), var(--color-azul-acento));
+    border-color: var(--color-azul-acento);
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para el color picker */
+input[type="color"] {
+    background: transparent;
+    border: 2px solid #374151;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="color"]:hover {
+    border-color: var(--color-azul-acento);
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
+}
+
+/* Animación de pulso para indicadores de estado */
+.pulse-animation {
+    animation: pulse-settings 2s infinite;
+}
+
+@keyframes pulse-settings {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+/* Estilos para vista previa del logo */
+#logo-preview {
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(255, 59, 59, 0.1), rgba(0, 191, 255, 0.1));
+    border: 1px solid rgba(0, 191, 255, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#logo-preview:hover {
+    background: linear-gradient(135deg, rgba(255, 59, 59, 0.15), rgba(0, 191, 255, 0.15));
+    border-color: rgba(0, 191, 255, 0.4);
+}
+
+/* Efectos hover para secciones de configuración */
+.tarjeta {
+    background-color: var(--color-tarjeta-fondo);
+    border: 1px solid rgba(75, 75, 75, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.tarjeta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    border-color: rgba(0, 191, 255, 0.3);
+}
+
+/* Estilos específicos para diferentes tipos de notificaciones en el estado */
+.estado-conectado {
+    color: #22C55E;
+}
+
+.estado-desconectado {
+    color: #EF4444;
+}
+
+.estado-pendiente {
+    color: #F59E0B;
+}
+
+/* Mejoras visuales para selectores */
+select.input-neon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300BFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+/* Estilos para el modo claro (cuando se active) */
+[data-theme="light"] {
+    --color-fondo-oscuro: #F8F9FA;
+    --color-tarjeta-fondo: #FFFFFF;
+    --color-texto-claro: #1F2937;
+    --color-texto-gris: #6B7280;
+}
+
+[data-theme="light"] body {
+    background-color: var(--color-fondo-oscuro);
+    color: var(--color-texto-claro);
+}
+
+[data-theme="light"] .sidebar {
+    background-color: var(--color-tarjeta-fondo);
+    border-right: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+[data-theme="light"] .tarjeta,
+[data-theme="light"] .tarjeta-kpi {
+    background-color: var(--color-tarjeta-fondo);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .input-neon {
+    background-color: #F9FAFB;
+    border-color: #D1D5DB;
+    color: var(--color-texto-claro);
+}
+
+[data-theme="light"] .nav-link {
+    color: var(--color-texto-gris);
+}
+
+[data-theme="light"] .nav-link:hover {
+    background-color: rgba(0, 191, 255, 0.1);
+}
+
+/* Transiciones suaves para el cambio de tema */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Estilos para notificaciones (reutilizados y adaptados) */
+.notificacion {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    max-width: 350px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.notificacion.show {
+    transform: translateX(0);
+}
+
+.notificacion.success {
+    background: linear-gradient(135deg, #22C55E, #16A34A);
+    border-left: 4px solid #15803D;
+}
+
+.notificacion.error {
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    border-left: 4px solid #B91C1C;
+}
+
+.notificacion.info {
+    background: linear-gradient(135deg, var(--color-azul-acento), #0284C7);
+    border-left: 4px solid #0369A1;
+}
+
+.notificacion.warning {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border-left: 4px solid #B45309;
+}
+
+/* Animaciones específicas para configuración */
+.config-updating {
+    animation: configPulse 1.5s infinite;
+}
+
+@keyframes configPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 191, 255, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(0, 191, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 191, 255, 0);
+    }
+}
+
+/* Estilo para elementos que se están guardando */
+.saving-state {
+    position: relative;
+    overflow: hidden;
+}
+
+.saving-state::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.3), transparent);
+    animation: savingProgress 2s infinite;
+}
+
+@keyframes savingProgress {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Mejoras responsive para configuración */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .contenido-principal {
+        margin-left: 0;
+    }
+    
+    .toggle-switch {
+        width: 44px;
+        height: 22px;
+    }
+    
+    .slider:before {
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+}
+
+@media (max-width: 640px) {
+    .grid.grid-cols-1.md\\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid.grid-cols-1.md\\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .flex.flex-wrap.gap-4 button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Estilos para drag and drop en upload de logo */
+.drag-drop-area {
+    border: 2px dashed #374151;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.drag-drop-area:hover,
+.drag-drop-area.drag-over {
+    border-color: var(--color-azul-acento);
+    background-color: rgba(0, 191, 255, 0.05);
+}
+
+.drag-drop-area.drag-over {
+    border-style: solid;
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.2);
+}
+
+/* Loading spinner personalizado */
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--color-azul-acento);
+    animation: spin 1s ease-in-out infinite;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Efectos visuales para elementos que han sido modificados */
+.config-modified {
+    border-left: 3px solid var(--color-alerta);
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent);
+}
+
+.config-saved {
+    border-left: 3px solid var(--color-exito);
+    background: linear-gradient(90deg, rgba(75, 181, 67, 0.1), transparent);
+    animation: configSaved 2s ease-out;
+}
+
+@keyframes configSaved {
+    0% {
+        background: linear-gradient(90deg, rgba(75, 181, 67, 0.3), transparent);
+    }
+    100% {
+        background: linear-gradient(90deg, rgba(75, 181, 67, 0.1), transparent);
+    }
+}
+
+/* Estilos para tooltips informativos */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--color-tarjeta-fondo);
+    color: var(--color-texto-claro);
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid rgba(0, 191, 255, 0.3);
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Mejoras para accesibilidad */
+button:focus,
+input:focus,
+select:focus {
+    outline: 2px solid var(--color-azul-acento);
+    outline-offset: 2px;
+}
+
+/* Estilos para indicadores de estado en tiempo real */
+.status-indicator {
+    position: relative;
+}
+
+.status-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -15px;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #22C55E;
+    animation: pulse-status 2s infinite;
+}
+
+.status-indicator.offline::before {
+    background-color: #EF4444;
+}
+
+.status-indicator.warning::before {
+    background-color: #F59E0B;
+}
+
+@keyframes pulse-status {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
