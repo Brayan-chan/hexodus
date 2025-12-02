@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexodus | Gestión de Ventas</title>
+    <!-- Mostrar iconos de Hexodus -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icon.png" />
+    <!-- Carga de CSS para ventas -->
+    <link rel="stylesheet" href="../assets/css/ventas.css">
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de íconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body onload="lucide.createIcons()">
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- 1. BARRA LATERAL DE NAVEGACIÓN (IDÉNTICA AL DASHBOARD) -->
+        <aside class="sidebar fixed z-30 inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out p-4 flex flex-col justify-between">
+            <div class="space-y-6">
+                <!-- Logo Hexodus (Usando la estructura del Dashboard para el tamaño) -->
+                <div class="flex items-center space-x-3 mb-8">
+                    <!-- CONTENEDOR PARA IMAGEN DEL LOGO COMPLETO-->
+                    <div class="h-10 w-10 icon-alerta-rojo flex items-center justify-center">
+                        <img src="../assets/images/icon.png" alt="Logo Hexodus">
+                    </div>
+                    <!-- TEXTO HEXODUS (Ahora text-xl) -->
+                    <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);">HEXODUS</span>
+                </div>
+
+                <!-- Menú Principal (Nombres de módulos simplificados) -->
+                <nav class="space-y-2">
+                    <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+                        Dashboard
+                    </a>
+                    <a href="socios.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                        Gestión de Socios 
+                    </a>
+                    <!-- Item Activo: Ventas -->
+                    <a href="#" class="nav-link nav-activo flex items-center p-3 rounded-lg text-sm font-medium">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
+                        Gestión de Ventas
+                    </a>
+                    <a href="#" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>
+                        Inventario y Productos
+                    </a>
+                    <a href="#" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
+                        Reportes
+                    </a>
+                    <a href="#" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="lock" class="w-5 h-5 mr-3"></i>
+                        Gestión de Usuarios
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Sección Inferior: Configuración -->
+            <div class="pb-4 border-t border-gray-800 pt-4">
+                 <a href="#" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                    <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+                    Configuración
+                </a>
+            </div>
+        </aside>
+
+        <!-- Overlay para móvil y botón de toggle (para responsividad) -->
+        <div id="backdrop" class="fixed inset-0 bg-black opacity-50 z-20 hidden md:hidden"></div>
+        <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg" style="background-color: var(--color-tarjeta-fondo);">
+            <i data-lucide="menu" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+        </button>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="flex-1 md:ml-64 flex flex-col contenido-principal">
+            <!-- ENCABEZADO SUPERIOR -->
+            <header class="encabezado-dashboard flex items-center justify-between p-4 md:p-6 bg-gray-900 border-b border-gray-700 flex-shrink-0 z-20">
+                <h1 class="text-2xl font-bold" style="color: var(--color-azul-acento);">Gestión de Ventas </h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm hidden sm:block" id="fecha-hora-header">Admin. | 01/12/2025 | 09:35 PM</span>
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Notificaciones"></i>
+                    <i data-lucide="log-out" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Cerrar Sesión"></i>
+                </div>
+            </header>
+
+            <!-- CONTENIDO SCROLLABLE -->
+            <div class="contenido-scrollable p-4 md:p-8 space-y-8">
+
+            <!-- KPIs SUPERIORES DE VENTAS -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI 1: Ventas del Día -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Ventas del Día</span>
+                        <i data-lucide="dollar-sign" class="w-6 h-6 icon-alerta-azul"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">$8,450.00</p>
+                    <span class="text-xs text-green-400 flex items-center"><i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +15% vs ayer</span>
+                </div>
+
+                <!-- KPI 2: Transacciones -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-rojo-principal);">Transacciones</span>
+                        <i data-lucide="credit-card" class="w-6 h-6 icon-alerta-rojo"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">47</p>
+                    <span class="text-xs text-gray-400">Promedio: $179.79</span>
+                </div>
+
+                <!-- KPI 3: Productos Vendidos -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Productos Vendidos</span>
+                        <i data-lucide="package" class="w-6 h-6 icon-alerta-azul"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">156</p>
+                    <span class="text-xs text-green-400 flex items-center"><i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +8% vs ayer</span>
+                </div>
+
+                <!-- KPI 4: Ventas del Mes -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-rojo-principal);">Ventas del Mes</span>
+                        <i data-lucide="calendar-days" class="w-6 h-6 icon-alerta-rojo"></i>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">$247,890.00</p>
+                    <span class="text-xs text-yellow-400">Meta: 85% alcanzada</span>
+                </div>
+            </section>
+
+            <!-- CONTENIDO DE GESTIÓN -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                <!-- COLUMNA 1: FILTROS Y ACCIÓN (1/4 del ancho) -->
+                <div class="lg:col-span-1 space-y-6">
+
+                    <!-- MÓDULO DE ACCIÓN PRINCIPAL: NUEVA VENTA -->
+                    <div class="tarjeta p-6 flex flex-col items-center">
+                        <i data-lucide="plus-circle" class="w-12 h-12 mb-4" style="color: var(--color-rojo-principal);"></i>
+                        <h2 class="text-xl font-semibold mb-4">Nueva Venta </h2>
+                        <p class="text-sm text-center mb-4 text-gray-400">Registra una nueva transacción de venta.</p>
+                        <button id="btn-nueva-venta" class="btn-principal w-full py-3 font-bold rounded-lg uppercase transition duration-300">
+                            <span class="flex items-center justify-center"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Nueva Venta</span>
+                        </button>
+                    </div>
+
+                    <!-- MÓDULO DE FILTROS -->
+                    <div class="tarjeta p-6">
+                        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-azul-acento);">Filtros y Consultas</h2>
+
+                        <!-- Búsqueda Principal -->
+                        <div class="mb-4">
+                            <label for="buscar" class="block text-sm font-medium mb-2 text-gray-400">Buscar Venta</label>
+                            <div class="relative">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                                <input type="text" id="buscar" placeholder="ID, producto o cliente..."
+                                       class="input-neon w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                            </div>
+                        </div>
+
+                        <!-- Filtro por Fecha -->
+                        <div class="mb-4">
+                            <label for="fecha-filtro" class="block text-sm font-medium mb-2 text-gray-400">Período de Tiempo</label>
+                            <select id="fecha-filtro"
+                                    class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                <option value="hoy">📅 Hoy</option>
+                                <option value="ayer">⏪ Ayer</option>
+                                <option value="semana">📊 Esta Semana</option>
+                                <option value="mes">📈 Este Mes</option>
+                                <option value="personalizado">🗓️ Personalizado</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Tipo de Pago -->
+                        <div class="mb-4">
+                            <label for="tipo-pago" class="block text-sm font-medium mb-2 text-gray-400">Método de Pago</label>
+                            <select id="tipo-pago"
+                                    class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                <option value="todos">Todos los Métodos</option>
+                                <option value="efectivo">💵 Efectivo</option>
+                                <option value="tarjeta">💳 Tarjeta</option>
+                                <option value="transferencia">🏦 Transferencia</option>
+                                <option value="digital">📱 Pago Digital</option>
+                            </select>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="space-y-2">
+                            <button id="btn-aplicar-filtros" class="btn-secundario w-full py-3 font-medium rounded-lg uppercase transition duration-300">
+                                <i data-lucide="filter" class="w-4 h-4 mr-2 inline"></i>Aplicar Filtros
+                            </button>
+                            <button id="btn-limpiar-filtros" class="w-full py-2 text-sm font-medium text-gray-400 hover:text-white transition duration-300">
+                                <i data-lucide="x-circle" class="w-4 h-4 mr-2 inline"></i>Limpiar Filtros
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- COLUMNA 2: TABLA DE VENTAS (3/4 del ancho) -->
+                <div class="lg:col-span-3">
+                    <div class="tarjeta p-6">
+                        <!-- Header con controles -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                            <div class="flex items-center mb-4 sm:mb-0">
+                                <i data-lucide="shopping-cart" class="w-6 h-6 mr-2" style="color: var(--color-azul-acento);"></i>
+                                <h2 class="text-xl font-semibold">Historial de Ventas</h2>
+                                <span class="ml-2 px-3 py-1 text-xs font-semibold rounded-full" style="background-color: rgba(0, 191, 255, 0.2); color: var(--color-azul-acento);" id="total-ventas">1,247 ventas</span>
+                            </div>
+                            
+                            <!-- Controles de vista -->
+                            <div class="flex items-center space-x-2">
+                                <label for="registros-por-pagina" class="text-sm text-gray-400">Mostrar:</label>
+                                <select id="registros-por-pagina" class="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm">
+                                    <option value="10">10</option>
+                                    <option value="25" selected>25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="text-sm text-gray-400">por página</span>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor de la Tabla con Scroll Mejorado -->
+                        <div class="overflow-x-auto tabla-scroll rounded-lg" style="max-height: calc(100vh - 480px);">
+                            <table class="min-w-full divide-y divide-gray-700">
+                                <thead class="bg-gray-700 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300 cursor-pointer hover:bg-gray-600 transition duration-200 sticky top-0 bg-gray-700">
+                                            <div class="flex items-center space-x-1">
+                                                <span>ID Venta</span>
+                                                <i data-lucide="chevrons-up-down" class="w-3 h-3"></i>
+                                            </div>
+                                        </th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Cliente</th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Productos</th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Total</th>
+                                        <th class="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300 cursor-pointer hover:bg-gray-600 transition duration-200">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Fecha</span>
+                                                <i data-lucide="chevrons-up-down" class="w-3 h-3"></i>
+                                            </div>
+                                        </th>
+                                        <th class="px-4 py-4 text-center text-xs font-medium uppercase tracking-wider text-gray-300">Método Pago</th>
+                                        <th class="px-4 py-4 text-center text-xs font-medium uppercase tracking-wider text-gray-300">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-800" id="tabla-ventas-body">
+                                    <!-- Las filas se generarán dinámicamente con JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Sistema de Paginación -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between mt-6 pt-4 border-t border-gray-700">
+                            <!-- Información de registros -->
+                            <div class="flex items-center mb-4 sm:mb-0">
+                                <span class="text-sm text-gray-400">Mostrando</span>
+                                <span class="mx-2 font-medium text-white" id="registros-inicio">1</span>
+                                <span class="text-gray-400">a</span>
+                                <span class="mx-2 font-medium text-white" id="registros-fin">25</span>
+                                <span class="text-gray-400">de</span>
+                                <span class="mx-2 font-medium text-white" id="total-registros">1247</span>
+                                <span class="text-gray-400">ventas</span>
+                            </div>
+                            
+                            <!-- Controles de paginación -->
+                            <div class="flex items-center space-x-2">
+                                <button id="btn-primera-pagina" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 rounded-l-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btn-pagina-anterior" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                
+                                <!-- Números de página -->
+                                <div class="flex items-center space-x-1" id="numeros-pagina">
+                                    <button class="px-3 py-2 text-sm font-medium text-white border border-gray-600 rounded transition duration-200" style="background-color: var(--color-rojo-principal); border-color: var(--color-rojo-principal);">1</button>
+                                    <button class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 rounded transition duration-200">2</button>
+                                    <button class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 rounded transition duration-200">3</button>
+                                    <span class="px-2 text-gray-500">...</span>
+                                    <button class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 rounded transition duration-200">50</button>
+                                </div>
+                                
+                                <button id="btn-pagina-siguiente" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 transition duration-200">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btn-ultima-pagina" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 rounded-r-lg transition duration-200">
+                                    <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Fin del contenido scrollable -->
+        </main>
+    </div>
+
+    <!-- MODAL DE NUEVA VENTA -->
+    <div id="modal-nueva-venta" class="fixed inset-0 hidden modal-fondo z-50 overflow-y-auto">
+        <div class="flex items-start justify-center min-h-screen pt-12 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0"></div>
+            </div>
+
+            <!-- Contenido del Modal -->
+            <div class="inline-block tarjeta modal-contenido overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-4xl sm:w-full my-8 text-left">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-700">
+                        <h3 class="text-2xl font-bold" style="color: var(--color-rojo-principal);">
+                            <i data-lucide="plus-circle" class="inline w-6 h-6 mr-2"></i> Registrar Nueva Venta 
+                        </h3>
+                        <button id="btn-cerrar-modal" class="text-gray-400 hover:text-white transition duration-200">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+
+                    <form id="form-nueva-venta">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- COLUMNA 1: INFORMACIÓN DE CLIENTE -->
+                            <div>
+                                <h4 class="text-lg font-semibold mb-4 text-gray-300 flex items-center">
+                                    <i data-lucide="user" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> 
+                                    Información del Cliente
+                                </h4>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="cliente-buscar" class="block text-sm font-medium mb-2 text-gray-400">Buscar Cliente</label>
+                                        <div class="relative">
+                                            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                                            <input type="text" id="cliente-buscar" name="cliente-buscar" placeholder="Nombre o ID del cliente..."
+                                                   class="input-neon w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="metodo-pago" class="block text-sm font-medium mb-2 text-gray-400">Método de Pago <span class="text-red-500">*</span></label>
+                                        <select id="metodo-pago" name="metodo-pago" required
+                                                class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                            <option value="">Selecciona método...</option>
+                                            <option value="efectivo">💵 Efectivo</option>
+                                            <option value="tarjeta">💳 Tarjeta de Crédito/Débito</option>
+                                            <option value="transferencia">🏦 Transferencia Bancaria</option>
+                                            <option value="digital">📱 Pago Digital (PayPal, etc.)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- COLUMNA 2: PRODUCTOS -->
+                            <div>
+                                <h4 class="text-lg font-semibold mb-4 text-gray-300 flex items-center">
+                                    <i data-lucide="package" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> 
+                                    Productos
+                                </h4>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="producto-buscar" class="block text-sm font-medium mb-2 text-gray-400">Agregar Producto</label>
+                                        <div class="flex space-x-2">
+                                            <div class="flex-1 relative">
+                                                <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                                                <input type="text" id="producto-buscar" placeholder="Buscar producto..."
+                                                       class="input-neon w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                                            </div>
+                                            <button type="button" id="btn-agregar-producto" class="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-200">
+                                                <i data-lucide="plus" class="w-5 h-5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Lista de productos seleccionados -->
+                                    <div class="bg-gray-800 rounded-lg p-4 max-h-60 overflow-y-auto">
+                                        <h5 class="text-sm font-medium mb-3 text-gray-300">Productos Seleccionados</h5>
+                                        <div id="lista-productos-seleccionados" class="space-y-2">
+                                            <div class="text-sm text-gray-400 text-center py-4">No hay productos seleccionados</div>
+                                        </div>
+                                        
+                                        <!-- Total -->
+                                        <div class="border-t border-gray-600 mt-4 pt-4">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-lg font-bold">Total:</span>
+                                                <span class="text-2xl font-bold" style="color: var(--color-rojo-principal);" id="total-venta">$0.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="flex justify-end space-x-4 pt-6 mt-6 border-t border-gray-700">
+                            <button type="button" id="btn-cancelar-venta" class="btn-secundario px-6 py-2 rounded-lg font-bold uppercase">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn-principal px-6 py-2 rounded-lg font-bold uppercase">
+                                PROCESAR VENTA
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/ventas.js"></script>
+</body>
+</html>
