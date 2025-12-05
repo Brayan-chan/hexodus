@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexodus | Gestión de Membresías</title>
+    <!-- Mostrar iconos de Hexodus -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icon.png" />
+    <!-- Carga de configuración global -->
+    <script src="../assets/js/global-config.js"></script>
+    <!-- Carga de CSS para membresías -->
+    <link rel="stylesheet" href="../assets/css/membresias.css">
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de íconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- 1. BARRA LATERAL DE NAVEGACIÓN (IDÉNTICA AL DASHBOARD) -->
+        <aside class="sidebar fixed z-30 inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out p-4 flex flex-col justify-between">
+            <div class="space-y-6">
+                <!-- Logo Hexodus -->
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="h-10 w-10 icon-alerta-rojo flex items-center justify-center">
+                        <img src="../assets/images/icon.png" alt="Logo Sistema" data-system-logo id="sidebar-logo-img">
+                    </div>
+                    <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);" data-system-name id="sidebar-logo-text">HEXODUS</span>
+                </div>
+
+                <!-- Menú Principal -->
+                <nav class="space-y-2">
+                    <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+                        Dashboard
+                    </a>
+                    <!-- Item Activo: Membresías -->
+                    <a href="#" class="nav-link nav-activo flex items-center p-3 rounded-lg text-sm font-medium">
+                        <i data-lucide="credit-card" class="w-5 h-5 mr-3"></i>
+                        Gestión de Membresías
+                    </a>
+                    <a href="socios.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                        Gestión de Socios 
+                    </a>
+                    <a href="ventas.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
+                        Gestión de Ventas
+                    </a>
+                    <a href="inventario.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>
+                        Inventario y Productos
+                    </a>
+                    <a href="reportes.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
+                        Reportes
+                    </a>
+                    <a href="usuarios.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="lock" class="w-5 h-5 mr-3"></i>
+                        Gestión de Usuarios
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Sección Inferior: Configuración -->
+            <div class="pb-4 border-t border-gray-800 pt-4">
+                 <a href="settings.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                    <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+                    Configuración
+                </a>
+            </div>
+        </aside>
+
+        <!-- Overlay para móvil y botón de toggle -->
+        <div id="backdrop" class="fixed inset-0 bg-black opacity-50 z-20 hidden md:hidden"></div>
+        <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg" style="background-color: var(--color-tarjeta-fondo);">
+            <i data-lucide="menu" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+        </button>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="contenido-principal flex-1 md:ml-64 flex flex-col">
+            <!-- ENCABEZADO SUPERIOR -->
+            <header class="encabezado-dashboard flex items-center justify-between p-4 md:p-6 bg-gray-900 border-b border-gray-700 flex-shrink-0 z-20">
+                <h1 class="text-2xl font-bold" style="color: var(--color-azul-acento);">Gestión de Membresías</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm hidden sm:block" id="fecha-hora-header">Admin. | 04/12/2025 | 12:10 PM</span>
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Notificaciones"></i>
+                    <i data-lucide="log-out" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Cerrar Sesión"></i>
+                </div>
+            </header>
+
+            <!-- CONTENIDO SCROLLABLE -->
+            <div class="contenido-scrollable overflow-y-auto flex-1 p-4 md:p-8 space-y-8">
+                
+            <!-- KPIs SUPERIORES DE MEMBRESÍAS -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI 1: Tipos de Membresías -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Tipos de Membresías</span>
+                        <i data-lucide="credit-card" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-white mb-2" id="kpi-tipos-membresias">8</div>
+                    <p class="text-sm text-gray-400">Planes activos</p>
+                </div>
+
+                <!-- KPI 2: Membresías Activas -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Membresías Activas</span>
+                        <i data-lucide="users" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-white mb-2" id="kpi-membresias-activas">245</div>
+                    <p class="text-sm text-gray-400">Socios con membresía vigente</p>
+                </div>
+
+                <!-- KPI 3: Ingresos Mensuales -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Ingresos Mensuales</span>
+                        <i data-lucide="dollar-sign" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-white mb-2" id="kpi-ingresos-mensuales">$342,000</div>
+                    <p class="text-sm text-gray-400">Recaudación proyectada</p>
+                </div>
+
+                <!-- KPI 4: Próximos Vencimientos -->
+                <div class="tarjeta-kpi p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium uppercase" style="color: var(--color-azul-acento);">Próximos Vencimientos</span>
+                        <i data-lucide="alert-triangle" class="w-6 h-6" style="color: var(--color-alerta);"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-white mb-2" id="kpi-proximos-vencimientos">23</div>
+                    <p class="text-sm text-gray-400">En los próximos 7 días</p>
+                </div>
+            </section>
+
+            <!-- CONTENIDO DE GESTIÓN -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                <!-- COLUMNA 1: FILTROS Y ACCIONES (1/4 del ancho) -->
+                <div class="lg:col-span-1 space-y-6">
+                    
+                    <!-- Botón de Nueva Membresía -->
+                    <div class="tarjeta p-6">
+                        <button id="btn-nueva-membresia" class="btn-principal w-full py-4 font-bold uppercase rounded-lg transition duration-300 hover:transform hover:scale-105">
+                            <span class="flex items-center justify-center"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Nueva Membresía</span>
+                        </button>
+                    </div>
+
+                    <!-- FILTROS -->
+                    <div class="tarjeta p-6">
+                        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-azul-acento);">Filtros</h2>
+
+                        <!-- Búsqueda -->
+                        <div class="mb-4">
+                            <label for="buscar-membresia" class="block text-sm font-medium mb-2 text-gray-400">Buscar Membresía</label>
+                            <div class="relative">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                                <input type="text" id="buscar-membresia" placeholder="Nombre, tipo o precio..."
+                                       class="input-neon w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                            </div>
+                        </div>
+
+                        <!-- Filtro por Tipo -->
+                        <div class="mb-4">
+                            <label for="filtro-tipo" class="block text-sm font-medium mb-2 text-gray-400">Tipo de Membresía</label>
+                            <select id="filtro-tipo" class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                <option value="todos">Todos los Tipos</option>
+                                <option value="dias">Por Días</option>
+                                <option value="semanal">Semanal</option>
+                                <option value="mensual">Mensual</option>
+                                <option value="anual">Anual</option>
+                                <option value="temporada">Temporada/Oferta</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Estado -->
+                        <div class="mb-4">
+                            <label for="filtro-estado" class="block text-sm font-medium mb-2 text-gray-400">Estado</label>
+                            <select id="filtro-estado" class="input-neon w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                                <option value="todos">Todos los Estados</option>
+                                <option value="activa">✅ Activa</option>
+                                <option value="inactiva">❌ Inactiva</option>
+                                <option value="oferta">🔥 En Oferta</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Rango de Precio -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2 text-gray-400">Rango de Precio</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="precio-min" placeholder="Mín" class="input-neon px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                                <input type="number" id="precio-max" placeholder="Máx" class="input-neon px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                            </div>
+                        </div>
+
+                        <!-- Botones de Filtro -->
+                        <div class="space-y-2">
+                            <button id="btn-aplicar-filtros" class="btn-secundario w-full py-3 font-medium rounded-lg uppercase transition duration-300">
+                                <i data-lucide="filter" class="w-4 h-4 mr-2 inline"></i>Aplicar Filtros
+                            </button>
+                            <button id="btn-limpiar-filtros" class="w-full py-2 text-sm font-medium text-gray-400 hover:text-white transition duration-300">
+                                <i data-lucide="x-circle" class="w-4 h-4 mr-2 inline"></i>Limpiar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA 2: LISTA DE MEMBRESÍAS (3/4 del ancho) -->
+                <div class="lg:col-span-3">
+                    <div class="tarjeta p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold" style="color: var(--color-azul-acento);">Tipos de Membresías</h2>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-gray-400" id="total-membresias">8 tipos registrados</span>
+                                <select id="registros-por-pagina" class="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm focus:ring-0">
+                                    <option value="10">10 por página</option>
+                                    <option value="25" selected>25 por página</option>
+                                    <option value="50">50 por página</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Grid de Membresías -->
+                        <div id="grid-membresias" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <!-- Las tarjetas de membresías se generarán dinámicamente aquí -->
+                        </div>
+                        
+                        <!-- Paginación -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between mt-8 pt-4 border-t border-gray-700">
+                            <!-- Información de registros -->
+                            <div class="flex items-center mb-4 sm:mb-0">
+                                <span class="text-sm text-gray-400">Mostrando</span>
+                                <span class="mx-2 font-medium text-white" id="registros-inicio">1</span>
+                                <span class="text-gray-400">a</span>
+                                <span class="mx-2 font-medium text-white" id="registros-fin">8</span>
+                                <span class="text-gray-400">de</span>
+                                <span class="mx-2 font-medium text-white" id="total-registros">8</span>
+                                <span class="text-gray-400">tipos</span>
+                            </div>
+                            
+                            <!-- Controles de paginación -->
+                            <div class="flex items-center space-x-2">
+                                <button id="btn-primera-pagina" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 rounded-l-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btn-pagina-anterior" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                
+                                <!-- Números de página -->
+                                <div class="flex items-center space-x-1" id="numeros-pagina">
+                                    <!-- Se generan dinámicamente -->
+                                </div>
+                                
+                                <button id="btn-pagina-siguiente" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 transition duration-200">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btn-ultima-pagina" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-600 rounded-r-lg transition duration-200">
+                                    <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL PARA NUEVA/EDITAR MEMBRESÍA -->
+    <div id="modal-membresia" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- Header del modal -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-700">
+                <h3 class="text-lg font-semibold text-white" id="modal-titulo">Nueva Membresía</h3>
+                <button id="btn-cerrar-modal" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <!-- Cuerpo del modal -->
+            <form id="form-membresia" class="p-6 space-y-6">
+                <!-- SECCIÓN 1: INFORMACIÓN BÁSICA -->
+                <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center">
+                    <i data-lucide="info" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i>
+                    Información Básica
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="nombre-membresia" class="block text-sm font-medium mb-1 text-gray-400">Nombre de la Membresía <span class="text-red-500">*</span></label>
+                        <input type="text" id="nombre-membresia" name="nombre-membresia" required
+                               class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0" 
+                               placeholder="ej. Mensual VIP">
+                    </div>
+                    <div>
+                        <label for="precio-membresia" class="block text-sm font-medium mb-1 text-gray-400">Precio <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-400">$</span>
+                            <input type="number" id="precio-membresia" name="precio-membresia" required min="0" step="0.01"
+                                   class="input-neon w-full pl-8 pr-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0" 
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: CONFIGURACIÓN DE DURACIÓN -->
+                <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center">
+                    <i data-lucide="calendar" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i>
+                    Configuración de Duración
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label for="tipo-duracion" class="block text-sm font-medium mb-1 text-gray-400">Tipo <span class="text-red-500">*</span></label>
+                        <select id="tipo-duracion" name="tipo-duracion" required
+                                class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                            <option value="">Seleccionar tipo...</option>
+                            <option value="dias">Por Días</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
+                            <option value="anual">Anual</option>
+                            <option value="temporada">Temporada/Oferta</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="duracion-cantidad" class="block text-sm font-medium mb-1 text-gray-400">Cantidad <span class="text-red-500">*</span></label>
+                        <input type="number" id="duracion-cantidad" name="duracion-cantidad" required min="1"
+                               class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0" 
+                               placeholder="1">
+                    </div>
+                    <div>
+                        <label for="duracion-unidad" class="block text-sm font-medium mb-1 text-gray-400">Unidad</label>
+                        <select id="duracion-unidad" name="duracion-unidad"
+                                class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white appearance-none focus:ring-0">
+                            <option value="dias">Días</option>
+                            <option value="semanas">Semanas</option>
+                            <option value="meses" selected>Meses</option>
+                            <option value="anos">Años</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: OPCIONES ADICIONALES -->
+                <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center">
+                    <i data-lucide="settings" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i>
+                    Opciones Adicionales
+                </h4>
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" id="es-oferta" name="es-oferta" class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-700 rounded focus:ring-blue-500">
+                        <label for="es-oferta" class="text-sm text-gray-400">Es una oferta especial</label>
+                    </div>
+                    <div id="oferta-detalles" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 ml-7">
+                        <div>
+                            <label for="precio-original" class="block text-sm font-medium mb-1 text-gray-400">Precio Original</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-400">$</span>
+                                <input type="number" id="precio-original" name="precio-original" min="0" step="0.01"
+                                       class="input-neon w-full pl-8 pr-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0" 
+                                       placeholder="0.00">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="fecha-vencimiento-oferta" class="block text-sm font-medium mb-1 text-gray-400">Válida hasta</label>
+                            <input type="date" id="fecha-vencimiento-oferta" name="fecha-vencimiento-oferta"
+                                   class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="descripcion-membresia" class="block text-sm font-medium mb-1 text-gray-400">Descripción</label>
+                        <textarea id="descripcion-membresia" name="descripcion-membresia" rows="3"
+                                  class="input-neon w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-0" 
+                                  placeholder="Descripción opcional de la membresía..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-700">
+                    <button type="button" id="btn-cancelar" class="btn-secundario px-6 py-2 rounded-lg font-bold uppercase">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-principal px-6 py-2 rounded-lg font-bold uppercase">
+                        Guardar Membresía
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../assets/js/membresias.js"></script>
+</body>
+</html>

@@ -21,6 +21,8 @@ let registrosPorPagina = 25;
 let totalProductos = 347;
 let productosFiltrados = [];
 let todosLosProductos = []; // Datos simulados - reemplazar con API calls
+let comprasRealizadas = []; // Nuevo: para almacenar compras
+let productosEnCompra = []; // Nuevo: para el carrito de compra actual
 
 // -----------------------------------------------------------
 // DATOS SIMULADOS (Reemplazar con llamadas a API)
@@ -446,7 +448,7 @@ const eliminarProducto = (productoId) => {
 };
 
 // -----------------------------------------------------------
-// FUNCIONES DEL MODAL
+// FUNCIONES DEL MODAL DE PRODUCTO
 // -----------------------------------------------------------
 const configurarModal = () => {
     const modal = document.getElementById('modal-producto');
@@ -498,57 +500,599 @@ const configurarModal = () => {
         }
     });
 
-    // Validación y envío del formulario
+    // Configurar validación del formulario
     if (formProducto) {
         formProducto.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            const formData = new FormData(formProducto);
-            const editId = formProducto.dataset.editId;
-            
-            const productoData = {
-                nombre: formData.get('nombre-producto'),
-                codigo: formData.get('codigo-producto'),
-                categoria: formData.get('categoria-producto'),
-                marca: formData.get('marca-producto'),
-                precioCompra: parseFloat(formData.get('precio-compra')),
-                precioVenta: parseFloat(formData.get('precio-venta')),
-                stockActual: parseInt(formData.get('stock-inicial')),
-                stockMinimo: parseInt(formData.get('stock-minimo')) || 5,
-                ubicacion: formData.get('ubicacion-producto') || 'Sin asignar',
-                descripcion: formData.get('descripcion-producto') || '',
-                fechaActualizacion: new Date(),
-                activo: true
-            };
-            
-            // Determinar estado del stock
-            if (productoData.stockActual === 0) {
-                productoData.estadoStock = 'agotado';
-            } else if (productoData.stockActual <= productoData.stockMinimo) {
-                productoData.estadoStock = 'bajo';
-            } else {
-                productoData.estadoStock = 'disponible';
-            }
-            
-            if (editId) {
-                // Actualizar producto existente
-                const producto = todosLosProductos.find(p => p.id === parseInt(editId));
-                if (producto) {
-                    Object.assign(producto, productoData);
-                    mostrarNotificacion('✅ Producto actualizado exitosamente', 'success');
-                }
-            } else {
-                // Crear nuevo producto
-                const nuevoId = Math.max(...todosLosProductos.map(p => p.id)) + 1;
-                productoData.id = nuevoId;
-                todosLosProductos.push(productoData);
-                mostrarNotificacion('✅ Producto creado exitosamente', 'success');
-            }
-            
-            aplicarFiltros();
-            closeModal();
+            guardarProducto();
         });
     }
+};
+
+// -----------------------------------------------------------
+// FUNCIONES DEL MODAL DE COMPRAS
+// -----------------------------------------------------------
+const configurarModalCompras = () => {
+    const modalCompra = document.getElementById('modal-compra');
+    const btnNuevaCompra = document.getElementById('btn-nueva-compra');
+    const btnCerrarCompra = document.getElementById('btn-cerrar-modal-compra');
+    const btnCancelarCompra = document.getElementById('btn-cancelar-compra');
+    const formCompra = document.getElementById('form-compra');
+    const btnAgregarProducto = document.getElementById('btn-agregar-producto-compra');
+    
+    // Establecer fecha actual por defecto
+    const fechaCompra = document.getElementById('fecha-compra');
+    if (fechaCompra) {
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaCompra.value = hoy;
+    }
+
+    if (btnNuevaCompra) {
+        btnNuevaCompra.addEventListener('click', () => {
+            abrirModalCompra();
+        });
+    }
+
+    const closeModalCompra = () => {
+        if (modalCompra) {
+            modalCompra.classList.add('hidden');
+            document.body.style.overflow = '';
+            if (formCompra) {
+                formCompra.reset();
+                // Restablecer fecha actual
+                const fechaCompra = document.getElementById('fecha-compra');
+                if (fechaCompra) {
+                    const hoy = new Date().toISOString().split('T')[0];
+                    fechaCompra.value = hoy;
+                }
+            }
+            productosEnCompra = [];
+            actualizarListaProductosCompra();
+        }
+    };
+
+    if (btnCerrarCompra) btnCerrarCompra.addEventListener('click', closeModalCompra);
+    if (btnCancelarCompra) btnCancelarCompra.addEventListener('click', closeModalCompra);
+
+    // Agregar producto a la compra
+    if (btnAgregarProducto) {
+        btnAgregarProducto.addEventListener('click', agregarProductoACompra);
+    }
+
+    // Validación del formulario de compra
+    if (formCompra) {
+        formCompra.addEventListener('submit', (e) => {
+            e.preventDefault();
+            procesarCompra();
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalCompra && !modalCompra.classList.contains('hidden')) {
+            closeModalCompra();
+        }
+    });
+};
+
+// Función para abrir el modal de compra y cargar productos
+const abrirModalCompra = () => {
+    const modalCompra = document.getElementById('modal-compra');
+    
+    // Inicializar el selector de productos mejorado
+    inicializarSelectorProductos();
+    
+    productosEnCompra = [];
+    actualizarListaProductosCompra();
+    
+    if (modalCompra) {
+        modalCompra.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    lucide.createIcons();
+};
+
+// Función para inicializar el selector de productos con búsqueda
+const inicializarSelectorProductos = () => {
+    const searchInput = document.getElementById('producto-compra-search');
+    const dropdown = document.getElementById('producto-compra-dropdown');
+    const productList = document.getElementById('producto-compra-list');
+    const emptyMessage = document.getElementById('producto-compra-empty');
+    const selectedInput = document.getElementById('producto-compra-selected');
+    const displayDiv = document.getElementById('producto-compra-display');
+    const clearBtn = document.getElementById('producto-compra-clear');
+    const costoInput = document.getElementById('costo-unitario');
+    
+    const productosActivos = todosLosProductos.filter(p => p.activo);
+    let filteredProducts = [...productosActivos];
+    
+    // Función para renderizar la lista de productos
+    const renderProductList = (productos) => {
+        if (productos.length === 0) {
+            productList.innerHTML = '';
+            emptyMessage.classList.remove('hidden');
+        } else {
+            emptyMessage.classList.add('hidden');
+            productList.innerHTML = productos.map(producto => {
+                const stockStatus = obtenerInfoEstadoStock(producto.estadoStock, producto.stockActual);
+                const isLowStock = producto.stockActual <= producto.stockMinimo;
+                const isOutOfStock = producto.stockActual === 0;
+                
+                return `
+                    <div class="producto-item p-3 hover:bg-gray-700 cursor-pointer rounded border-b border-gray-700 last:border-b-0 transition-all duration-200 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}" 
+                         data-id="${producto.id}" 
+                         data-precio="${producto.precioCompra}"
+                         data-stock="${producto.stockActual}"
+                         data-stock-minimo="${producto.stockMinimo}"
+                         ${isOutOfStock ? 'data-disabled="true"' : ''}>
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium text-white">${producto.nombre}</span>
+                                    ${isOutOfStock ? '<span class="px-1.5 py-0.5 bg-red-900 text-red-300 rounded text-xs">SIN STOCK</span>' : ''}
+                                    ${isLowStock && !isOutOfStock ? '<span class="px-1.5 py-0.5 bg-yellow-900 text-yellow-300 rounded text-xs">BAJO</span>' : ''}
+                                </div>
+                                <div class="text-sm text-gray-400 mt-1">
+                                    <span class="bg-blue-900 text-blue-300 px-2 py-0.5 rounded text-xs mr-2">${producto.codigo}</span>
+                                    <span class="text-gray-300">${producto.marca}</span>
+                                </div>
+                                <div class="flex items-center gap-3 mt-1 text-xs">
+                                    <span class="${stockStatus.className}">Stock: ${producto.stockActual}</span>
+                                    <span class="text-gray-400">Mín: ${producto.stockMinimo}</span>
+                                    <span class="text-gray-400">${obtenerInfoCategoria(producto.categoria).nombre}</span>
+                                </div>
+                            </div>
+                            <div class="text-right text-sm">
+                                <div class="text-green-400 font-semibold">$${producto.precioCompra.toFixed(2)}</div>
+                                <div class="text-xs text-gray-400">Costo unitario</div>
+                                ${producto.precioVenta ? `<div class="text-xs text-blue-400">Venta: $${producto.precioVenta.toFixed(2)}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    };
+    
+    // Función para filtrar productos
+    const filterProducts = (searchTerm) => {
+        const term = searchTerm.toLowerCase().trim();
+        if (!term) {
+            filteredProducts = [...productosActivos];
+        } else {
+            filteredProducts = productosActivos.filter(producto => 
+                producto.nombre.toLowerCase().includes(term) ||
+                producto.codigo.toLowerCase().includes(term) ||
+                producto.marca.toLowerCase().includes(term)
+            );
+        }
+        renderProductList(filteredProducts);
+    };
+    
+    // Event listeners
+    if (searchInput) {
+        // Mostrar dropdown al hacer focus
+        searchInput.addEventListener('focus', () => {
+            filterProducts(searchInput.value);
+            dropdown.classList.remove('hidden');
+        });
+        
+        // Filtrar mientras se escribe
+        searchInput.addEventListener('input', (e) => {
+            filterProducts(e.target.value);
+            dropdown.classList.remove('hidden');
+        });
+        
+        // Ocultar dropdown al perder focus (con delay para permitir clicks)
+        searchInput.addEventListener('blur', (e) => {
+            setTimeout(() => {
+                if (!dropdown.contains(document.activeElement)) {
+                    dropdown.classList.add('hidden');
+                }
+            }, 200);
+        });
+    }
+    
+    // Click en producto
+    if (productList) {
+        productList.addEventListener('click', (e) => {
+            const item = e.target.closest('.producto-item');
+            if (item && !item.dataset.disabled) {
+                const productoId = item.dataset.id;
+                const precio = item.dataset.precio;
+                const stock = parseInt(item.dataset.stock);
+                const stockMinimo = parseInt(item.dataset.stockMinimo);
+                const producto = productosActivos.find(p => p.id == productoId);
+                
+                if (producto && producto.stockActual > 0) {
+                    // Actualizar campos
+                    selectedInput.value = productoId;
+                    searchInput.value = '';
+                    
+                    // Mostrar producto seleccionado
+                    const infoDiv = document.getElementById('producto-compra-info');
+                    const warningDiv = document.getElementById('producto-compra-stock-warning');
+                    const stockStatus = obtenerInfoEstadoStock(producto.estadoStock, producto.stockActual);
+                    const categoriaInfo = obtenerInfoCategoria(producto.categoria);
+                    
+                    if (infoDiv) {
+                        infoDiv.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <div class="flex-shrink-0 w-6 h-6 bg-blue-900/30 rounded flex items-center justify-center">
+                                    <i data-lucide="package" class="w-3 h-3 text-blue-400"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-white truncate leading-tight">${producto.nombre}</h4>
+                                    <div class="flex items-center gap-2 mt-1 text-xs flex-wrap">
+                                        <span class="px-1.5 py-0.5 bg-blue-900 text-blue-300 rounded flex-shrink-0">${producto.codigo}</span>
+                                        <span class="text-gray-300 truncate">${producto.marca}</span>
+                                        <span class="${stockStatus.className} font-medium flex-shrink-0">Stock: ${producto.stockActual}</span>
+                                    </div>
+                                    <div class="mt-1 text-xs">
+                                        <span class="text-green-400 font-semibold">$${producto.precioCompra.toFixed(2)}</span>
+                                        <span class="text-gray-400 ml-1">costo unitario</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Mostrar advertencia si stock es bajo
+                    if (warningDiv) {
+                        if (stock <= stockMinimo) {
+                            warningDiv.classList.remove('hidden');
+                        } else {
+                            warningDiv.classList.add('hidden');
+                        }
+                    }
+                    
+                    displayDiv.classList.remove('hidden');
+                    
+                    // Auto-llenar precio
+                    if (costoInput) {
+                        costoInput.value = precio;
+                    }
+                    
+                    // Ocultar dropdown
+                    dropdown.classList.add('hidden');
+                    
+                    // Mostrar notificación de selección
+                    mostrarNotificacion(`Producto seleccionado: ${producto.nombre}`, 'success');
+                } else {
+                    mostrarNotificacion('Este producto no tiene stock disponible', 'warning');
+                }
+            }
+        });
+    }
+    
+    // Botón para limpiar selección
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            selectedInput.value = '';
+            searchInput.value = '';
+            displayDiv.classList.add('hidden');
+            
+            // Limpiar precio y ocultar advertencia
+            if (costoInput) {
+                costoInput.value = '';
+            }
+            
+            const warningDiv = document.getElementById('producto-compra-stock-warning');
+            if (warningDiv) {
+                warningDiv.classList.add('hidden');
+            }
+            
+            // Focus al campo de búsqueda
+            searchInput.focus();
+            
+            mostrarNotificacion('Selección de producto eliminada', 'info');
+        });
+    }
+    
+    // Cerrar dropdown al hacer click fuera
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+    
+    // Inicializar con todos los productos
+    filterProducts('');
+};
+
+// Función para agregar producto a la compra
+const agregarProductoACompra = () => {
+    const selectedInput = document.getElementById('producto-compra-selected');
+    const cantidadInput = document.getElementById('cantidad-compra');
+    const costoInput = document.getElementById('costo-unitario');
+    const searchInput = document.getElementById('producto-compra-search');
+    const displayDiv = document.getElementById('producto-compra-display');
+    
+    const productoId = selectedInput.value;
+    const cantidad = parseInt(cantidadInput.value) || 0;
+    const costoUnitario = parseFloat(costoInput.value) || 0;
+    
+    if (!productoId || cantidad <= 0 || costoUnitario <= 0) {
+        mostrarNotificacion('Por favor, complete todos los campos correctamente', 'error');
+        return;
+    }
+    
+    const producto = todosLosProductos.find(p => p.id == productoId);
+    if (!producto) {
+        mostrarNotificacion('Producto no encontrado', 'error');
+        return;
+    }
+    
+    // Verificar si el producto ya está en la compra
+    const productoExistente = productosEnCompra.find(p => p.id == productoId);
+    if (productoExistente) {
+        productoExistente.cantidad += cantidad;
+        productoExistente.total = productoExistente.cantidad * productoExistente.costoUnitario;
+    } else {
+        productosEnCompra.push({
+            id: productoId,
+            nombre: producto.nombre,
+            codigo: producto.codigo,
+            cantidad: cantidad,
+            costoUnitario: costoUnitario,
+            total: cantidad * costoUnitario
+        });
+    }
+    
+    // Limpiar campos
+    selectedInput.value = '';
+    searchInput.value = '';
+    displayDiv.classList.add('hidden');
+    cantidadInput.value = '1';
+    costoInput.value = '';
+    
+    actualizarListaProductosCompra();
+    mostrarNotificacion('Producto agregado a la compra', 'success');
+};
+
+// Función para actualizar la lista de productos en la compra
+const actualizarListaProductosCompra = () => {
+    const tbody = document.getElementById('lista-productos-compra');
+    const totalSpan = document.getElementById('total-compra');
+    
+    if (!tbody || !totalSpan) return;
+    
+    if (productosEnCompra.length === 0) {
+        tbody.innerHTML = '<tr class="text-gray-400"><td colspan="5" class="text-center p-8">No hay productos agregados</td></tr>';
+        totalSpan.textContent = '$0.00';
+        return;
+    }
+    
+    let total = 0;
+    tbody.innerHTML = productosEnCompra.map(producto => {
+        total += producto.total;
+        return `
+            <tr class="border-b border-gray-800 hover:bg-gray-800 transition duration-200">
+                <td class="p-2 text-white">${producto.nombre} (${producto.codigo})</td>
+                <td class="p-2 text-center text-white">${producto.cantidad}</td>
+                <td class="p-2 text-right text-white">$${producto.costoUnitario.toFixed(2)}</td>
+                <td class="p-2 text-right text-green-400 font-semibold">$${producto.total.toFixed(2)}</td>
+                <td class="p-2 text-center">
+                    <button type="button" onclick="eliminarProductoCompra(${producto.id})" 
+                            class="text-red-400 hover:text-red-300 p-1">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    totalSpan.textContent = `$${total.toFixed(2)}`;
+    lucide.createIcons();
+};
+
+// Función para eliminar producto de la compra
+const eliminarProductoCompra = (productoId) => {
+    productosEnCompra = productosEnCompra.filter(p => p.id != productoId);
+    actualizarListaProductosCompra();
+    mostrarNotificacion('Producto eliminado de la compra', 'info');
+};
+
+// Función para procesar la compra
+const procesarCompra = () => {
+    const proveedor = document.getElementById('proveedor-compra').value.trim();
+    const tipoPago = document.getElementById('tipo-pago-compra').value;
+    const fechaCompra = document.getElementById('fecha-compra').value;
+    
+    if (!proveedor || !tipoPago || !fechaCompra || productosEnCompra.length === 0) {
+        mostrarNotificacion('Por favor, complete todos los campos y agregue al menos un producto', 'error');
+        return;
+    }
+    
+    // Calcular total
+    const totalCompra = productosEnCompra.reduce((sum, p) => sum + p.total, 0);
+    
+    // Crear registro de compra
+    const nuevaCompra = {
+        id: Date.now(),
+        fecha: fechaCompra,
+        proveedor: proveedor,
+        tipoPago: tipoPago,
+        productos: [...productosEnCompra],
+        total: totalCompra,
+        fechaRegistro: new Date().toISOString()
+    };
+    
+    // Agregar a lista de compras
+    comprasRealizadas.push(nuevaCompra);
+    
+    // Actualizar stock de productos
+    productosEnCompra.forEach(productoCompra => {
+        const producto = todosLosProductos.find(p => p.id == productoCompra.id);
+        if (producto) {
+            producto.stockActual += productoCompra.cantidad;
+            // Actualizar precio de compra si es diferente
+            producto.precioCompra = productoCompra.costoUnitario;
+            // Actualizar estado del stock
+            if (producto.stockActual === 0) {
+                producto.estadoStock = 'agotado';
+            } else if (producto.stockActual <= producto.stockMinimo) {
+                producto.estadoStock = 'bajo';
+            } else {
+                producto.estadoStock = 'disponible';
+            }
+            producto.fechaActualizacion = new Date();
+        }
+    });
+    
+    // Cerrar modal
+    document.getElementById('modal-compra').classList.add('hidden');
+    document.body.style.overflow = '';
+    
+    // Actualizar interfaz
+    actualizarTabla();
+    actualizarKPIs();
+    
+    mostrarNotificacion(`Compra registrada exitosamente. Total: $${totalCompra.toFixed(2)}`, 'success');
+    
+    // Limpiar
+    document.getElementById('form-compra').reset();
+    productosEnCompra = [];
+    
+    // Restablecer fecha actual
+    const fechaInput = document.getElementById('fecha-compra');
+    if (fechaInput) {
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaInput.value = hoy;
+    }
+    
+    console.log('Compra registrada:', nuevaCompra);
+};
+
+// -----------------------------------------------------------
+// FUNCIÓN PARA GUARDAR PRODUCTO
+// -----------------------------------------------------------
+const guardarProducto = () => {
+    const formData = new FormData(document.getElementById('form-producto'));
+    const editId = document.getElementById('form-producto').dataset.editId;
+    
+    // Validar datos básicos
+    const nombre = formData.get('nombre-producto').trim();
+    const codigo = formData.get('codigo-producto').trim();
+    const categoria = formData.get('categoria-producto');
+    const precioCompra = parseFloat(formData.get('precio-compra')) || 0;
+    const precioVenta = parseFloat(formData.get('precio-venta')) || 0;
+    
+    if (!nombre || !codigo || !categoria || precioCompra <= 0 || precioVenta <= 0) {
+        mostrarNotificacion('Por favor, complete todos los campos requeridos correctamente', 'error');
+        return;
+    }
+    
+    // Verificar código único (excepto al editar el mismo producto)
+    const codigoExiste = todosLosProductos.find(p => 
+        p.codigo.toLowerCase() === codigo.toLowerCase() && 
+        (!editId || p.id != editId)
+    );
+    
+    if (codigoExiste) {
+        mostrarNotificacion('Ya existe un producto con ese código', 'error');
+        return;
+    }
+    
+    const nuevoProducto = {
+        id: editId ? parseInt(editId) : Date.now(),
+        codigo: codigo,
+        nombre: nombre,
+        categoria: categoria,
+        marca: formData.get('marca-producto') || 'Sin marca',
+        precioCompra: precioCompra,
+        precioVenta: precioVenta,
+        stockActual: parseInt(formData.get('stock-inicial')) || 0,
+        stockMinimo: parseInt(formData.get('stock-minimo')) || 0,
+        ubicacion: formData.get('ubicacion-producto') || 'Sin ubicación',
+        descripcion: formData.get('descripcion-producto') || '',
+        activo: true,
+        fechaCreacion: editId ? todosLosProductos.find(p => p.id == editId)?.fechaCreacion : new Date().toISOString(),
+        fechaActualizacion: new Date().toISOString()
+    };
+    
+    // Determinar estado del stock
+    const stockActual = nuevoProducto.stockActual;
+    const stockMinimo = nuevoProducto.stockMinimo;
+    if (stockActual === 0) {
+        nuevoProducto.estadoStock = 'agotado';
+    } else if (stockActual <= stockMinimo) {
+        nuevoProducto.estadoStock = 'bajo';
+    } else {
+        nuevoProducto.estadoStock = 'disponible';
+    }
+    
+    if (editId) {
+        // Editar producto existente
+        const index = todosLosProductos.findIndex(p => p.id == editId);
+        if (index !== -1) {
+            todosLosProductos[index] = nuevoProducto;
+            mostrarNotificacion('Producto actualizado exitosamente', 'success');
+        }
+    } else {
+        // Agregar nuevo producto
+        todosLosProductos.push(nuevoProducto);
+        totalProductos++;
+        mostrarNotificacion('Producto agregado exitosamente', 'success');
+    }
+    
+    // Cerrar modal y actualizar interfaz
+    document.getElementById('modal-producto').classList.add('hidden');
+    document.body.style.overflow = '';
+    
+    aplicarFiltros();
+    actualizarTabla();
+    actualizarPaginacion();
+    actualizarKPIs();
+    
+    console.log(editId ? 'Producto editado:' : 'Producto agregado:', nuevoProducto);
+};
+
+// -----------------------------------------------------------
+// FUNCIÓN PARA MOSTRAR NOTIFICACIONES
+// -----------------------------------------------------------
+const mostrarNotificacion = (mensaje, tipo = 'info') => {
+    const notificacion = document.createElement('div');
+    notificacion.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
+    
+    const iconos = {
+        success: '✅',
+        error: '❌', 
+        warning: '⚠️',
+        info: 'ℹ️'
+    };
+    
+    const colores = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-yellow-600', 
+        info: 'bg-blue-600'
+    };
+    
+    notificacion.classList.add(colores[tipo] || colores.info);
+    notificacion.innerHTML = `
+        <div class="flex items-center text-white">
+            <span class="mr-2">${iconos[tipo] || iconos.info}</span>
+            <span>${mensaje}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notificacion);
+    
+    // Mostrar la notificación
+    setTimeout(() => {
+        notificacion.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Auto-remover después de 4 segundos
+    setTimeout(() => {
+        notificacion.classList.add('translate-x-full');
+        setTimeout(() => {
+            if (document.body.contains(notificacion)) {
+                document.body.removeChild(notificacion);
+            }
+        }, 300);
+    }, 4000);
 };
 
 // -----------------------------------------------------------
@@ -598,33 +1142,6 @@ const configurarEventListeners = () => {
     }
 };
 
-// Sistema de notificaciones
-const mostrarNotificacion = (mensaje, tipo = 'info') => {
-    const notificacion = document.createElement('div');
-    notificacion.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 transition-all duration-300 transform translate-x-full`;
-    
-    const colores = {
-        'success': 'bg-green-600',
-        'error': 'bg-red-600', 
-        'warning': 'bg-yellow-600',
-        'info': 'bg-blue-600'
-    };
-    
-    notificacion.className += ` ${colores[tipo]}`;
-    notificacion.textContent = mensaje;
-    
-    document.body.appendChild(notificacion);
-    
-    // Animar entrada
-    setTimeout(() => notificacion.classList.remove('translate-x-full'), 100);
-    
-    // Auto-remover después de 3 segundos
-    setTimeout(() => {
-        notificacion.classList.add('translate-x-full');
-        setTimeout(() => document.body.removeChild(notificacion), 300);
-    }, 3000);
-};
-
 // Lógica para toggle en móvil (simplificada como en socios.js)
 const menuToggle = document.getElementById('menu-toggle');
 const backdrop = document.getElementById('backdrop');
@@ -662,6 +1179,7 @@ const inicializarInventario = () => {
     // Configurar event listeners
     configurarEventListeners();
     configurarModal();
+    configurarModalCompras(); // Nuevo: configurar modal de compras
     
     actualizarTabla();
     actualizarPaginacion();

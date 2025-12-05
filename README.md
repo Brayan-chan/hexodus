@@ -163,6 +163,9 @@ El sistema cuenta con una barra lateral fija que incluye:
 - Categorización
 - Alertas de stock bajo
 - Búsqueda por múltiples criterios
+- **Registro de compras para reabastecimiento**
+- **Control de proveedores y tipos de pago**
+- **Actualización automática de stock**
 
 #### 💰 Ventas
 - Registro de transacciones
