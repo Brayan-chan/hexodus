@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Asistencia - Hexodus</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icon.png" />
+    <script src="../assets/js/global-config.js"></script>
+    <link rel="stylesheet" href="../assets/css/registro.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<body onload="lucide.createIcons()">
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- BARRA LATERAL DE NAVEGACIÓN -->
+        <aside class="sidebar fixed z-30 inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out p-4 flex flex-col justify-between">
+            <div class="space-y-6">
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="h-10 w-10 icon-alerta-rojo flex items-center justify-center">
+                        <img src="../assets/images/icon.png" alt="Logo Sistema" data-system-logo id="sidebar-logo-img">
+                    </div>
+                    <span class="text-xl font-bold tracking-widest uppercase" style="color: var(--color-rojo-principal);" data-system-name id="sidebar-logo-text">HEXODUS</span>
+                </div>
+
+                <nav class="space-y-2">
+                    <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+                        Dashboard
+                    </a>
+                    <a href="membresias.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="credit-card" class="w-5 h-5 mr-3"></i>
+                        Gestión de Membresías
+                    </a>
+                    <a href="socios.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                        Gestión de Socios 
+                    </a>
+                    <a href="registro.html" class="nav-link nav-activo flex items-center p-3 rounded-lg text-sm font-medium">
+                        <i data-lucide="scan-face" class="w-5 h-5 mr-3"></i>
+                        Control de Asistencia
+                    </a>
+                    <a href="ventas.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
+                        Gestión de Ventas
+                    </a>
+                    <a href="inventario.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>
+                        Inventario y Productos
+                    </a>
+                    <a href="reportes.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
+                        Reportes
+                    </a>
+                    <a href="usuarios.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="lock" class="w-5 h-5 mr-3"></i>
+                        Gestión de Usuarios
+                    </a>
+                </nav>
+            </div>
+
+            <div class="pb-4 border-t border-gray-800 pt-4">
+                 <a href="settings.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                    <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+                    Configuración
+                </a>
+            </div>
+        </aside>
+
+        <!-- Overlay para móvil -->
+        <div id="backdrop" class="fixed inset-0 bg-black opacity-50 z-20 hidden md:hidden"></div>
+        <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg" style="background-color: var(--color-tarjeta-fondo);">
+            <i data-lucide="menu" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+        </button>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="contenido-principal flex-1 md:ml-64 flex flex-col">
+            <!-- ENCABEZADO SUPERIOR -->
+            <header class="encabezado-dashboard flex items-center justify-between p-4 md:p-6 bg-gray-900 border-b border-gray-700 flex-shrink-0 z-20">
+                <div>
+                    <h1 class="text-2xl font-bold" style="color: var(--color-azul-acento);">Control de Asistencia</h1>
+                    <p class="text-gray-400 text-sm">Panel de administración del sistema de registro facial</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="clock" class="w-5 h-5 text-blue-400"></i>
+                        <span id="hora-actual" class="text-sm">--:--:--</span>
+                    </div>
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Notificaciones"></i>
+                    <i data-lucide="log-out" class="w-6 h-6 text-gray-400 hover:text-white transition duration-200 cursor-pointer" title="Cerrar Sesión"></i>
+                </div>
+            </header>
+
+            <!-- CONTENIDO SCROLLABLE -->
+            <div class="contenido-scrollable overflow-y-auto flex-1 p-4 md:p-8 space-y-8">
+                
+                <!-- SECCIÓN: KPIs DEL DÍA -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    
+                    <div class="tarjeta-kpi">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg" style="background-color: rgba(0, 191, 255, 0.1);">
+                                <i data-lucide="users-round" class="w-6 h-6" style="color: var(--color-azul-acento);"></i>
+                            </div>
+                            <i data-lucide="trending-up" class="w-5 h-5 text-green-500"></i>
+                        </div>
+                        <h3 class="text-gray-400 text-sm mb-2">Asistentes Hoy</h3>
+                        <div class="kpi-valor" id="kpi-asistentes-hoy">0</div>
+                    </div>
+
+                    <div class="tarjeta-kpi">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg" style="background-color: rgba(75, 181, 67, 0.1);">
+                                <i data-lucide="activity" class="w-6 h-6" style="color: var(--color-exito);"></i>
+                            </div>
+                            <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                        </div>
+                        <h3 class="text-gray-400 text-sm mb-2">Activos Ahora</h3>
+                        <div class="kpi-valor" style="color: var(--color-exito);" id="kpi-activos-ahora">0</div>
+                    </div>
+
+                    <div class="tarjeta-kpi">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg" style="background-color: rgba(255, 0, 0, 0.1);">
+                                <i data-lucide="alert-circle" class="w-6 h-6" style="color: var(--color-peligro);"></i>
+                            </div>
+                            <i data-lucide="trending-down" class="w-5 h-5 text-red-500"></i>
+                        </div>
+                        <h3 class="text-gray-400 text-sm mb-2">Accesos Denegados</h3>
+                        <div class="kpi-valor" style="color: var(--color-peligro);" id="kpi-denegados">0</div>
+                    </div>
+
+                    <div class="tarjeta-kpi">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg" style="background-color: rgba(255, 215, 0, 0.1);">
+                                <i data-lucide="timer" class="w-6 h-6" style="color: var(--color-alerta);"></i>
+                            </div>
+                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                        </div>
+                        <h3 class="text-gray-400 text-sm mb-2">Prom. Permanencia</h3>
+                        <div class="kpi-valor" style="color: var(--color-alerta);" id="kpi-permanencia">0h 0m</div>
+                    </div>
+                    
+                </div>
+
+                <!-- SECCIÓN: CONTROL DE PANTALLA DE ESCANEO -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Panel de Control -->
+                    <div class="lg:col-span-1">
+                        <div class="tarjeta">
+                            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                                <i data-lucide="monitor" class="w-5 h-5" style="color: var(--color-azul-acento);"></i>
+                                Pantalla de Escaneo
+                            </h3>
+
+                            <!-- Estado de la Pantalla -->
+                            <div class="mb-6 p-4 rounded-lg" style="background-color: rgba(28, 28, 32, 0.6);">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-sm text-gray-400">Estado:</span>
+                                    <div class="flex items-center gap-2">
+                                        <div id="pantalla-status-indicator" class="w-3 h-3 rounded-full bg-gray-500"></div>
+                                        <span id="pantalla-status-text" class="text-sm font-semibold">Cerrada</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-400">Sistema:</span>
+                                    <div class="flex items-center gap-2">
+                                        <div id="sistema-status-indicator" class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                        <span id="sistema-status-text" class="text-sm font-semibold">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón Principal -->
+                            <button id="btn-abrir-pantalla" class="btn-principal w-full px-6 py-4 rounded-lg justify-center gap-3 mb-4 text-lg" disabled>
+                                <i data-lucide="monitor-play" class="w-6 h-6"></i>
+                                <span>Abrir Pantalla de Escaneo</span>
+                            </button>
+
+                            <button id="btn-cerrar-pantalla" class="btn-secundario w-full px-6 py-4 rounded-lg justify-center gap-3 text-lg" style="display: none;">
+                                <i data-lucide="monitor-off" class="w-6 h-6"></i>
+                                <span>Cerrar Pantalla de Escaneo</span>
+                            </button>
+
+                            <!-- Información -->
+                            <div class="mt-6 p-4 rounded-lg border border-gray-700">
+                                <p class="text-xs text-gray-400 mb-2">
+                                    <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
+                                    La pantalla de escaneo se abrirá en una ventana separada para que los socios puedan registrar su entrada.
+                                </p>
+                                <p class="text-xs text-gray-400">
+                                    <i data-lucide="clock" class="w-4 h-4 inline mr-1"></i>
+                                    Después de cada escaneo, la pantalla se reiniciará automáticamente en 10 segundos.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Configuración -->
+                        <div class="tarjeta mt-6">
+                            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                                <i data-lucide="settings" class="w-5 h-5" style="color: var(--color-azul-acento);"></i>
+                                Configuración
+                            </h3>
+
+                            <div class="space-y-4">
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-semibold text-sm">Sonido de Alertas</p>
+                                        <p class="text-xs text-gray-400">Reproducir sonido al detectar</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="config-sonido" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-semibold text-sm">Detección Automática</p>
+                                        <p class="text-xs text-gray-400">Escanear continuamente</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="config-auto-detect" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-semibold text-sm">Mostrar Detección</p>
+                                        <p class="text-xs text-gray-400">Visualizar puntos faciales</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="config-show-detection" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold text-sm block mb-2">Umbral de Confianza</label>
+                                    <input type="range" id="config-threshold" min="0.3" max="0.7" step="0.05" value="0.5" class="w-full">
+                                    <p class="text-xs text-gray-400 mt-1">Valor: <span id="threshold-value">0.5</span></p>
+                                </div>
+
+                                <div>
+                                    <label class="font-semibold text-sm block mb-2">Tiempo de Reset (segundos)</label>
+                                    <input type="number" id="config-reset-time" min="5" max="30" value="10" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                                    <p class="text-xs text-gray-400 mt-1">Tiempo antes de permitir nuevo escaneo</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Registros -->
+                    <div class="lg:col-span-2">
+                        <div class="tarjeta h-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-bold flex items-center gap-2">
+                                    <i data-lucide="history" class="w-5 h-5" style="color: var(--color-azul-acento);"></i>
+                                    Registros de Hoy
+                                </h3>
+                                <div class="flex items-center gap-2">
+                                    <button id="btn-exportar-registros" class="btn-secundario px-3 py-1 rounded text-xs">
+                                        <i data-lucide="download" class="w-4 h-4 inline"></i>
+                                        Exportar
+                                    </button>
+                                    <button id="btn-limpiar-historial" class="btn-secundario px-3 py-1 rounded text-xs">
+                                        <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
+                                        Limpiar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Filtros -->
+                            <div class="flex items-center gap-4 mb-4">
+                                <select id="filtro-tipo" class="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm">
+                                    <option value="todos">Todos los registros</option>
+                                    <option value="permitido">Accesos permitidos</option>
+                                    <option value="denegado">Accesos denegados</option>
+                                </select>
+                                <input type="text" id="buscar-socio" placeholder="Buscar socio..." class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm">
+                            </div>
+
+                            <!-- Lista de Registros -->
+                            <div id="historial-registros" class="overflow-y-auto" style="max-height: 600px;">
+                                <p class="text-center text-gray-400 py-8">No hay registros recientes</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/registro.js"></script>
+</body>
+</html>
