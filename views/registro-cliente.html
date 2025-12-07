@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escaneo Facial - Hexodus</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/registro.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0A0E27 0%, #16213E 100%);
+        }
+        
+        .pantalla-completa {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-header {
+            padding: 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid var(--color-azul-acento);
+        }
+        
+        .contenido-escaneo {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .video-principal {
+            position: relative;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .info-socio-grande {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 14, 39, 0.95);
+            border: 3px solid var(--color-azul-acento);
+            border-radius: 20px;
+            padding: 3rem;
+            min-width: 500px;
+            box-shadow: 0 0 50px rgba(0, 191, 255, 0.5);
+            animation: slideIn 0.5s ease-out;
+            z-index: 100;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        
+        .foto-grande {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 5px solid var(--color-azul-acento);
+            box-shadow: 0 0 30px rgba(0, 191, 255, 0.7);
+            object-fit: cover;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(0, 191, 255, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(0, 191, 255, 1);
+            }
+        }
+        
+        .mensaje-grande {
+            font-size: 3rem;
+            font-weight: 900;
+            text-align: center;
+            margin: 2rem 0;
+            text-shadow: 0 0 20px currentColor;
+            animation: textGlow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes textGlow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .mensaje-exito {
+            color: var(--color-exito);
+        }
+        
+        .mensaje-error {
+            color: var(--color-peligro);
+        }
+        
+        .mensaje-warning {
+            color: var(--color-alerta);
+        }
+        
+        .countdown-timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-azul-acento);
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .estado-inicial {
+            text-align: center;
+            color: var(--color-texto-claro);
+        }
+        
+        .estado-inicial h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--color-azul-acento);
+        }
+        
+        .estado-inicial p {
+            font-size: 1.5rem;
+            color: var(--color-texto-gris);
+        }
+        
+        .scan-animation {
+            animation: scanPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes scanPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="pantalla-completa">
+        
+        <!-- Logo Header -->
+        <div class="logo-header">
+            <div class="flex items-center justify-center gap-4">
+                <img src="../assets/images/icon.png" alt="Logo" class="h-16 w-16">
+                <h1 class="text-5xl font-bold tracking-widest" style="color: var(--color-rojo-principal);">HEXODUS</h1>
+            </div>
+            <p class="text-gray-400 mt-2 text-lg">Sistema de Reconocimiento Facial</p>
+        </div>
+        
+        <!-- Contenido Principal -->
+        <div class="contenido-escaneo">
+            
+            <!-- Video Container -->
+            <div class="video-principal">
+                
+                <!-- Video Feed -->
+                <div class="video-container glow-effect scan-animation">
+                    <video id="video-feed" class="video-feed" autoplay muted playsinline></video>
+                    <canvas id="canvas-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+                    
+                    <!-- Overlay de Escaneo -->
+                    <div id="scan-overlay" class="scan-overlay" style="display: none;">
+                        <div class="scan-line"></div>
+                    </div>
+
+                    <!-- Mensaje de Estado Inicial -->
+                    <div id="estado-inicial" class="absolute inset-0 flex items-center justify-center" style="background: rgba(10, 14, 39, 0.7);">
+                        <div class="estado-inicial">
+                            <i data-lucide="scan-face" class="w-32 h-32 mx-auto mb-6" style="color: var(--color-azul-acento);"></i>
+                            <h2>Acércate al Escáner</h2>
+                            <p>Posiciona tu rostro frente a la cámara</p>
+                            <div class="mt-8 flex items-center justify-center gap-3">
+                                <div class="w-4 h-4 rounded-full bg-blue-500 animate-pulse"></div>
+                                <span class="text-xl text-gray-400">Esperando...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje de Cargando -->
+                    <div id="mensaje-cargando" class="absolute inset-0 flex items-center justify-center" style="background: rgba(10, 14, 39, 0.9); display: none;">
+                        <div class="text-center">
+                            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 mb-4" style="border-color: var(--color-azul-acento);"></div>
+                            <p class="text-2xl font-bold" style="color: var(--color-azul-acento);">Inicializando Sistema...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del Socio (Overlay grande) -->
+                <div id="info-socio-overlay" style="display: none;">
+                    <div class="info-socio-grande">
+                        
+                        <!-- Foto del Socio -->
+                        <div class="text-center mb-6">
+                            <img id="socio-foto-grande" src="../assets/images/default-avatar.png" alt="Foto" class="foto-grande mx-auto">
+                        </div>
+
+                        <!-- Nombre del Socio -->
+                        <h2 id="socio-nombre-grande" class="text-4xl font-bold text-center mb-2" style="color: var(--color-texto-claro);">---</h2>
+                        <p id="socio-id-grande" class="text-center text-gray-400 text-lg mb-6">ID: ---</p>
+
+                        <!-- Mensaje Principal -->
+                        <div id="mensaje-principal-grande" class="mensaje-grande mensaje-exito">
+                            ✓ ¡BIENVENIDO!
+                        </div>
+
+                        <!-- Detalles -->
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-center justify-between text-lg">
+                                <span class="text-gray-400">Membresía:</span>
+                                <span id="socio-membresia-grande" class="font-bold" style="color: var(--color-texto-claro);">---</span>
+                            </div>
+                            <div class="flex items-center justify-between text-lg">
+                                <span class="text-gray-400">Vencimiento:</span>
+                                <span id="socio-vencimiento-grande" class="font-bold" style="color: var(--color-texto-claro);">---</span>
+                            </div>
+                        </div>
+
+                        <!-- Submensaje -->
+                        <p id="submensaje-grande" class="text-center text-xl text-gray-300 mb-4">¡Que tengas un excelente entrenamiento!</p>
+
+                        <!-- Countdown -->
+                        <div class="countdown-timer">
+                            <i data-lucide="clock" class="w-6 h-6 inline"></i>
+                            Siguiente escaneo en: <span id="countdown-seconds">10</span>s
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+        
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="../assets/js/registro-cliente.js"></script>
+</body>
+</html>
