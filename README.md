@@ -329,13 +329,13 @@ El sistema incluye datos simulados para testing:
 
 ## 📄 Licencia
 
-Este proyecto es propiedad de **Hexodus** y está destinado para uso interno del gimnasio.
+Este proyecto es propiedad de **JARB'S SOLUTIONS** y está destinado para uso interno del gimnasio Hexodus.
 
 ## 📞 Soporte
 
 Para soporte técnico o consultas:
-- **Email**: soporte@hexodus.com
-- **Teléfono**: +52 123 456 7890
+- **Email**: jarbs.solutions@gmail.com
+- **Teléfono**: +52 981 243 8166
 - **Horario**: Lunes a Viernes, 9:00 - 18:00 hrs
 
 ---
