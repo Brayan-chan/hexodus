@@ -343,3 +343,52 @@ body {
 .tooltip:hover::after {
     opacity: 1;
 }
+
+/* ===================================================================
+   ESTILOS PARA CAPTURA FACIAL
+   =================================================================== */
+
+#modal-captura-facial .modal-fondo {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+#modal-captura-facial #video-captura-facial {
+    border-radius: 0.5rem;
+}
+
+#overlay-deteccion {
+    animation: pulse-detection 2s infinite;
+}
+
+@keyframes pulse-detection {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+#preview-foto-socio {
+    transition: all 0.3s ease;
+}
+
+#preview-foto-socio:hover {
+    transform: scale(1.05);
+}
+
+#estado-deteccion {
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
