@@ -47,6 +47,11 @@
                         <i data-lucide="users" class="w-5 h-5 mr-3"></i>
                         Gestión de Socios 
                     </a>
+                    <!-- Anclaje al rejistro de entradas de los socios al gimnasio -->
+                    <a href="registro.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="laptop-minimal-check" class="w-5 h-5 mr-3"></i>
+                        Registro
+                    </a>
                     <a href="ventas.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
                         <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
                         Gestión de Ventas
@@ -506,7 +511,27 @@
                             </div>
                         </div>
 
-                        <!-- SECCIÓN 2: ASIGNACIÓN DE MEMBRESÍA -->
+                        <!-- SECCIÓN 2: CAPTURA DE ROSTRO PARA RECONOCIMIENTO -->
+                        <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center"><i data-lucide="scan-face" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> Captura Facial para Acceso</h4>
+                        <div class="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div id="preview-foto-socio" class="w-20 h-20 rounded-full bg-gray-900 border-2 border-gray-700 flex items-center justify-center overflow-hidden">
+                                        <i data-lucide="user" class="w-8 h-8 text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-400">Captura el rostro del socio para el sistema de acceso</p>
+                                        <p id="estado-captura-facial" class="text-xs text-gray-500 mt-1">Sin captura</p>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-capturar-rostro" class="btn-principal px-4 py-2 rounded-lg font-bold uppercase flex items-center">
+                                    <i data-lucide="camera" class="w-5 h-5 mr-2"></i>
+                                    Capturar Rostro
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 3: ASIGNACIÓN DE MEMBRESÍA -->
                         <h4 class="text-lg font-semibold mb-3 text-gray-300 flex items-center"><i data-lucide="credit-card" class="w-5 h-5 mr-2" style="color: var(--color-azul-acento);"></i> Asignar Membresía (RF09)</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                             <div>
@@ -553,6 +578,72 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CAPTURA FACIAL -->
+    <div id="modal-captura-facial" class="fixed inset-0 hidden modal-fondo z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 py-6">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0"></div>
+            </div>
+
+            <!-- Contenido del Modal -->
+            <div class="inline-block tarjeta modal-contenido overflow-hidden shadow-xl transform transition-all sm:max-w-2xl sm:w-full text-left">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-700">
+                        <h3 class="text-2xl font-bold" style="color: var(--color-rojo-principal);">
+                            <i data-lucide="scan-face" class="inline w-6 h-6 mr-2"></i> Captura Facial para Acceso
+                        </h3>
+                        <button id="btn-cerrar-modal-facial" class="text-gray-400 hover:text-white transition duration-200">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+
+                    <!-- Video para captura -->
+                    <div class="mb-6">
+                        <div class="relative bg-gray-900 rounded-lg overflow-hidden border-2 border-gray-700" style="aspect-ratio: 4/3;">
+                            <video id="video-captura-facial" autoplay playsinline class="w-full h-full object-cover"></video>
+                            <canvas id="canvas-captura-facial" class="hidden"></canvas>
+                            
+                            <!-- Overlay de detección -->
+                            <div id="overlay-deteccion" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="w-48 h-48 border-4 rounded-full animate-pulse" style="border-color: var(--color-azul-acento);"></div>
+                            </div>
+                            
+                            <!-- Estado de detección -->
+                            <div id="estado-deteccion" class="absolute top-4 left-4 right-4 bg-gray-900 bg-opacity-90 rounded-lg px-4 py-2 text-center">
+                                <p class="text-sm font-semibold text-white">Posiciona tu rostro en el círculo</p>
+                                <p id="mensaje-deteccion" class="text-xs text-gray-400 mt-1">Esperando detección...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instrucciones -->
+                    <div class="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+                        <h4 class="text-sm font-semibold mb-2 text-gray-300 flex items-center">
+                            <i data-lucide="info" class="w-4 h-4 mr-2 text-blue-400"></i> Instrucciones
+                        </h4>
+                        <ul class="text-xs text-gray-400 space-y-1">
+                            <li>• Asegúrate de tener buena iluminación</li>
+                            <li>• Mira directamente a la cámara</li>
+                            <li>• Mantén una expresión neutral</li>
+                            <li>• Espera a que se detecte tu rostro automáticamente</li>
+                        </ul>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="btn-cancelar-captura" class="btn-secundario px-6 py-2 rounded-lg font-bold uppercase">
+                            Cancelar
+                        </button>
+                        <button type="button" id="btn-confirmar-captura" disabled class="btn-principal px-6 py-2 rounded-lg font-bold uppercase opacity-50 cursor-not-allowed">
+                            <i data-lucide="check" class="inline w-5 h-5 mr-2"></i>
+                            Confirmar Captura
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -841,6 +932,8 @@
         </div>
     </div>
 
+    <!-- face-api.js para reconocimiento facial -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script src="../assets/js/socios.js"></script>
 </body>
 </html>
