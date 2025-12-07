@@ -189,6 +189,25 @@ document.addEventListener('DOMContentLoaded', () => {
 // DATOS SIMULADOS ACTUALIZADOS CON NUEVAS MEMBRESÍAS
 // -----------------------------------------------------------
 const generateMockData = () => {
+    // Intentar cargar socios desde localStorage
+    const sociosGuardados = localStorage.getItem('hexodus_socios');
+    if (sociosGuardados) {
+        try {
+            const sociosCargados = JSON.parse(sociosGuardados);
+            // Reconstruir fechas que se convirtieron a strings
+            sociosCargados.forEach(socio => {
+                socio.fechaVencimiento = new Date(socio.fechaVencimiento);
+                socio.fechaIngreso = new Date(socio.fechaIngreso);
+            });
+            todosLosSocios.push(...sociosCargados);
+            console.log(`✅ ${sociosCargados.length} socios cargados desde localStorage`);
+            return;
+        } catch (error) {
+            console.error('❌ Error cargando socios desde localStorage:', error);
+        }
+    }
+    
+    // Si no hay datos guardados, generar datos de prueba
     const nombres = ['Juan López', 'Andrea González', 'Carlos Ortíz', 'María Rodríguez', 'Luis Martínez', 'Ana Sánchez', 'Pedro García', 'Laura Jiménez', 'Miguel Torres', 'Carmen Ruiz'];
     const apellidos = ['Pérez', 'González', 'Rodríguez', 'García', 'López', 'Martínez', 'Sánchez', 'Jiménez', 'Torres', 'Ruiz'];
     const membresiasIds = ['diaria-estandar', 'semanal-basica', 'mensual-premium', 'trimestral-gold', 'anual-platinum', 'verano-2024'];
@@ -213,9 +232,15 @@ const generateMockData = () => {
             membresiaInfo: membresiaInfo,
             fechaVencimiento: new Date(Date.now() + (Math.random() * 365 * 24 * 60 * 60 * 1000)),
             estado: estado,
-            fechaIngreso: new Date(Date.now() - (Math.random() * 365 * 24 * 60 * 60 * 1000))
+            fechaIngreso: new Date(Date.now() - (Math.random() * 365 * 24 * 60 * 60 * 1000)),
+            faceDescriptor: null,
+            foto: null
         });
     }
+    
+    // Guardar datos iniciales en localStorage
+    localStorage.setItem('hexodus_socios', JSON.stringify(todosLosSocios));
+    console.log('✅ Datos de prueba generados y guardados en localStorage');
 };
 
 // -----------------------------------------------------------
@@ -361,7 +386,11 @@ const actualizarTabla = () => {
 
 const generarFilaSocio = (socio) => {
     const membresiaInfo = obtenerInfoMembresia(socio.membresia);
-    const estadoInfo = obtenerInfoEstado(socio.estado);
+    
+    // Calcular estado real basado en pagos
+    const estadoReal = calcularEstadoRealSocio(socio.id);
+    const estadoInfo = obtenerInfoEstado(estadoReal);
+    
     const fechaFormateada = socio.fechaVencimiento.toLocaleDateString('es-ES');
     const diasRestantes = Math.ceil((socio.fechaVencimiento - new Date()) / (1000 * 60 * 60 * 24));
     
@@ -492,64 +521,108 @@ let socioSeleccionado = null;
 let membresiaSeleccionadaPago = null;
 
 // Función para generar datos de pagos simulados
-const generarDatosPagosSimulados = (socioId) => {
-    const socio = todosLosSocios.find(s => s.id === socioId);
-    if (!socio) return [];
+// =====================================================================
+// GESTIÓN REAL DE MEMBRESÍAS Y PAGOS (localStorage)
+// =====================================================================
 
-    // Generar historial de membresías y pagos
-    const historialMembresias = [];
-    const fechaIngreso = new Date(socio.fechaIngreso);
+// Obtener todas las membresías de un socio desde localStorage
+const obtenerMembresiasDelSocio = (socioId) => {
+    const membresiasJSON = localStorage.getItem('hexodus_membresias');
+    if (!membresiasJSON) return [];
     
-    // Agregar membresía actual
-    historialMembresias.push({
-        id: `mem_${socioId}_1`,
-        socioId: socioId,
-        membresiaId: socio.membresia,
-        membresiaInfo: socio.membresiaInfo,
-        fechaInicio: fechaIngreso,
-        fechaVencimiento: socio.fechaVencimiento,
-        precio: socio.membresiaInfo.precio,
-        estado: socio.estado,
-        pagos: generarPagosMembresia(socioId, socio.membresiaInfo.precio, fechaIngreso)
-    });
-
-    // Agregar membresías anteriores simuladas (si tiene más de 6 meses)
-    if (Date.now() - fechaIngreso.getTime() > 6 * 30 * 24 * 60 * 60 * 1000) {
-        const fechaAnterior = new Date(fechaIngreso);
-        fechaAnterior.setMonth(fechaAnterior.getMonth() - 3);
-        
-        historialMembresias.unshift({
-            id: `mem_${socioId}_2`,
-            socioId: socioId,
-            membresiaId: 'mensual-premium',
-            membresiaInfo: cargarMembresiasSistema().find(m => m.id === 'mensual-premium'),
-            fechaInicio: fechaAnterior,
-            fechaVencimiento: new Date(fechaAnterior.getTime()),
-            precio: 1200,
-            estado: 'pagada',
-            pagos: generarPagosMembresia(socioId, 1200, fechaAnterior, true)
-        });
+    try {
+        const todasMembresias = JSON.parse(membresiasJSON);
+        return todasMembresias.filter(m => m.socioId === socioId);
+    } catch (error) {
+        console.error('Error cargando membresías:', error);
+        return [];
     }
-
-    return historialMembresias;
 };
 
-// Función para generar pagos de una membresía específica
-const generarPagosMembresia = (socioId, precio, fechaMembresia, completo = false) => {
-    const pagos = [];
+// Obtener todos los pagos desde localStorage
+const obtenerPagosDelSocio = (socioId) => {
+    const pagosJSON = localStorage.getItem('hexodus_pagos');
+    if (!pagosJSON) return [];
     
-    if (completo || Math.random() > 0.3) {
-        pagos.push({
-            id: `pago_${socioId}_${Date.now()}`,
-            fecha: fechaMembresia,
-            importe: precio,
-            folio: `F${Math.floor(Math.random() * 10000)}`,
-            tipo: ['efectivo', 'tarjeta', 'transferencia'][Math.floor(Math.random() * 3)],
-            observaciones: completo ? 'Pago completo' : 'Pago registrado'
-        });
+    try {
+        const todosPagos = JSON.parse(pagosJSON);
+        return todosPagos.filter(p => p.socioId === socioId);
+    } catch (error) {
+        console.error('Error cargando pagos:', error);
+        return [];
     }
+};
+
+// Crear o actualizar membresía inicial del socio
+const crearMembresiaInicial = (socio) => {
+    const membresiasJSON = localStorage.getItem('hexodus_membresias');
+    let membresias = membresiasJSON ? JSON.parse(membresiasJSON) : [];
     
-    return pagos;
+    // Verificar si ya existe membresía para este socio
+    const existente = membresias.find(m => m.socioId === socio.id && m.activa);
+    if (existente) return;
+    
+    const nuevaMembresia = {
+        id: `mem_${socio.id}_${Date.now()}`,
+        socioId: socio.id,
+        membresiaId: socio.membresia,
+        membresiaInfo: socio.membresiaInfo,
+        fechaInicio: socio.fechaIngreso,
+        fechaVencimiento: socio.fechaVencimiento,
+        precio: socio.membresiaInfo.precio,
+        activa: true,
+        fechaCreacion: new Date()
+    };
+    
+    membresias.push(nuevaMembresia);
+    localStorage.setItem('hexodus_membresias', JSON.stringify(membresias));
+    console.log('✅ Membresía inicial creada:', nuevaMembresia);
+};
+
+// Obtener historial de membresías con pagos reales
+const obtenerHistorialMembresias = (socioId) => {
+    const membresias = obtenerMembresiasDelSocio(socioId);
+    const todosPagos = obtenerPagosDelSocio(socioId);
+    
+    return membresias.map(membresia => {
+        // Obtener pagos de esta membresía
+        const pagosMembresia = todosPagos.filter(p => p.membresiaId === membresia.id);
+        const totalPagado = pagosMembresia.reduce((sum, p) => sum + p.importe, 0);
+        
+        return {
+            ...membresia,
+            pagos: pagosMembresia,
+            totalPagado: totalPagado,
+            estadoPago: totalPagado >= membresia.precio ? 'pagada' : totalPagado > 0 ? 'parcial' : 'pendiente'
+        };
+    }).sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio));
+};
+
+// Calcular estado real del socio basado en pagos
+const calcularEstadoRealSocio = (socioId) => {
+    const membresias = obtenerMembresiasDelSocio(socioId);
+    const membresiaActiva = membresias.find(m => m.activa);
+    
+    if (!membresiaActiva) return 'sin_membresia';
+    
+    const todosPagos = obtenerPagosDelSocio(socioId);
+    const pagosMembresia = todosPagos.filter(p => p.membresiaId === membresiaActiva.id);
+    const totalPagado = pagosMembresia.reduce((sum, p) => sum + p.importe, 0);
+    
+    const fechaVenc = new Date(membresiaActiva.fechaVencimiento);
+    const ahora = new Date();
+    const diasRestantes = Math.ceil((fechaVenc - ahora) / (1000 * 60 * 60 * 24));
+    
+    // Determinar estado
+    if (totalPagado < membresiaActiva.precio) {
+        return 'adeudo'; // No ha pagado completo
+    } else if (fechaVenc < ahora) {
+        return 'expirado'; // Pagó pero ya venció
+    } else if (diasRestantes <= 3) {
+        return 'proximo'; // Pagó y está próximo a vencer
+    } else {
+        return 'activo'; // Pagó y está vigente
+    }
 };
 
 // Función para abrir modal de gestión de membresías
@@ -557,20 +630,28 @@ const abrirModalGestionMembresias = (socioId) => {
     socioSeleccionado = todosLosSocios.find(s => s.id === parseInt(socioId));
     if (!socioSeleccionado) return;
 
+    // Crear membresía inicial si no existe
+    crearMembresiaInicial(socioSeleccionado);
+
     // Actualizar información del socio
     document.getElementById('socio-nombre').textContent = socioSeleccionado.nombre;
     document.getElementById('socio-id').textContent = socioSeleccionado.id;
 
+    // Calcular estado real basado en pagos
+    const estadoReal = calcularEstadoRealSocio(socioSeleccionado.id);
+    
     // Actualizar información de membresía actual
     const membresiaActual = socioSeleccionado.membresiaInfo;
     document.getElementById('tipo-actual').textContent = membresiaActual.nombre;
     document.getElementById('precio-actual').textContent = `$${membresiaActual.precio.toLocaleString()} MXN`;
-    document.getElementById('vencimiento-actual').textContent = socioSeleccionado.fechaVencimiento.toLocaleDateString('es-ES');
+    document.getElementById('vencimiento-actual').textContent = new Date(socioSeleccionado.fechaVencimiento).toLocaleDateString('es-ES');
     
-    const estadoInfo = obtenerInfoEstado(socioSeleccionado.estado);
+    const estadoInfo = obtenerInfoEstado(estadoReal);
     const estadoElement = document.getElementById('estado-actual');
     estadoElement.textContent = estadoInfo.nombre;
     estadoElement.style.color = estadoInfo.textColor;
+
+    console.log('📊 Estado real del socio:', estadoReal);
 
     // Cargar historial de membresías
     cargarHistorialMembresias(socioId);
@@ -583,16 +664,18 @@ const abrirModalGestionMembresias = (socioId) => {
 // Función para cargar historial de membresías en la tabla
 const cargarHistorialMembresias = (socioId) => {
     const tbody = document.getElementById('historial-membresias-body');
-    const historial = generarDatosPagosSimulados(socioId);
+    const historial = obtenerHistorialMembresias(socioId);
+    
+    console.log('📋 Historial de membresías:', historial);
     
     tbody.innerHTML = historial.map(membresia => {
-        const totalPagado = membresia.pagos.reduce((sum, pago) => sum + pago.importe, 0);
-        const estadoPago = totalPagado >= membresia.precio ? 'Pagada' : totalPagado > 0 ? 'Parcial' : 'Sin pagar';
+        const totalPagado = membresia.totalPagado || 0;
+        const estadoPago = membresia.estadoPago === 'pagada' ? 'Pagada' : membresia.estadoPago === 'parcial' ? 'Parcial' : 'Pendiente';
         const colorEstado = estadoPago === 'Pagada' ? 'text-green-400' : estadoPago === 'Parcial' ? 'text-yellow-400' : 'text-red-400';
         
         return `
             <tr class="hover:bg-gray-800 transition duration-200">
-                <td class="px-4 py-3 text-sm text-white">${membresia.fechaInicio.toLocaleDateString('es-ES')}</td>
+                <td class="px-4 py-3 text-sm text-white">${new Date(membresia.fechaInicio).toLocaleDateString('es-ES')}</td>
                 <td class="px-4 py-3 text-sm">
                     <div class="text-white font-semibold">${membresia.membresiaInfo.nombre}</div>
                     <div class="text-xs text-gray-400">${membresia.membresiaInfo.duracion} ${membresia.membresiaInfo.unidad}</div>
@@ -602,7 +685,7 @@ const cargarHistorialMembresias = (socioId) => {
                     <div class="${colorEstado} font-semibold">${estadoPago}</div>
                     <div class="text-xs text-gray-400">$${totalPagado.toLocaleString()} / $${membresia.precio.toLocaleString()}</div>
                 </td>
-                <td class="px-4 py-3 text-sm text-white">${membresia.fechaVencimiento.toLocaleDateString('es-ES')}</td>
+                <td class="px-4 py-3 text-sm text-white">${new Date(membresia.fechaVencimiento).toLocaleDateString('es-ES')}</td>
                 <td class="px-4 py-3 text-center">
                     <button class="p-2 text-gray-400 hover:text-green-400 hover:bg-green-400/10 rounded transition duration-200 btn-pagar-membresia" 
                             title="Gestionar Pagos" data-membresia-id="${membresia.id}">
@@ -619,30 +702,42 @@ const cargarHistorialMembresias = (socioId) => {
 
 // Función para abrir modal de registrar pago
 const abrirModalRegistrarPago = (membresiaId) => {
-    const historial = generarDatosPagosSimulados(socioSeleccionado.id);
+    const historial = obtenerHistorialMembresias(socioSeleccionado.id);
     membresiaSeleccionadaPago = historial.find(m => m.id === membresiaId);
     
     if (!membresiaSeleccionadaPago) return;
 
-    // Actualizar información de la membresía
-    document.getElementById('pago-fecha').textContent = membresiaSeleccionadaPago.fechaInicio.toLocaleDateString('es-ES');
-    document.getElementById('pago-precio').textContent = `$${membresiaSeleccionadaPago.precio.toLocaleString()} MXN`;
+    console.log('💳 Abriendo modal de pago para membresía:', membresiaSeleccionadaPago);
+
+    // Obtener el precio real de la membresía desde la configuración del socio
+    const precioReal = socioSeleccionado.membresiaInfo?.precio || membresiaSeleccionadaPago.precio;
     
-    const totalPagado = membresiaSeleccionadaPago.pagos.reduce((sum, pago) => sum + pago.importe, 0);
+    // Actualizar información de la membresía
+    document.getElementById('pago-fecha').textContent = new Date(membresiaSeleccionadaPago.fechaInicio).toLocaleDateString('es-ES');
+    document.getElementById('pago-precio').textContent = `$${precioReal.toLocaleString()} MXN`;
+    
+    const totalPagado = membresiaSeleccionadaPago.totalPagado || 0;
     document.getElementById('pago-total-pagado').textContent = `$${totalPagado.toLocaleString()} MXN`;
     
-    // Actualizar estado de pago
+    // Guardar el precio real en el objeto membresiaSeleccionadaPago para usarlo en validaciones
+    membresiaSeleccionadaPago.precioReal = precioReal;
+    
+    // Actualizar estado de pago basado en el precio real
     const estadoPagoDisplay = document.getElementById('estado-pago-display');
-    if (totalPagado >= membresiaSeleccionadaPago.precio) {
+    const estadoPagoReal = totalPagado >= precioReal ? 'pagada' : totalPagado > 0 ? 'parcial' : 'pendiente';
+    
+    if (estadoPagoReal === 'pagada') {
         estadoPagoDisplay.className = 'mt-3 p-2 rounded text-center bg-green-600/20 text-green-400';
         estadoPagoDisplay.innerHTML = '<span class="font-semibold">✅ Pagada</span>';
-    } else if (totalPagado > 0) {
+    } else if (estadoPagoReal === 'parcial') {
         estadoPagoDisplay.className = 'mt-3 p-2 rounded text-center bg-yellow-600/20 text-yellow-400';
         estadoPagoDisplay.innerHTML = '<span class="font-semibold">⚠️ Pago Parcial</span>';
     } else {
         estadoPagoDisplay.className = 'mt-3 p-2 rounded text-center bg-red-600/20 text-red-400';
-        estadoPagoDisplay.innerHTML = '<span class="font-semibold">❌ Sin pagar</span>';
+        estadoPagoDisplay.innerHTML = '<span class="font-semibold">❌ Pendiente de Pago</span>';
     }
+
+    console.log(`💵 Estado de pago: ${estadoPagoReal} - Total pagado: $${totalPagado} de $${precioReal}`);
 
     // Cargar historial de pagos
     cargarHistorialPagosMembresia();
@@ -655,13 +750,25 @@ const abrirModalRegistrarPago = (membresiaId) => {
 const cargarHistorialPagosMembresia = () => {
     const tbody = document.getElementById('historial-pagos-membresia');
     
+    if (!membresiaSeleccionadaPago.pagos || membresiaSeleccionadaPago.pagos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="py-4 text-center text-gray-500">
+                    No hay pagos registrados para esta membresía
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
     tbody.innerHTML = membresiaSeleccionadaPago.pagos.map((pago, index) => `
         <tr>
             <td class="py-2 text-white">${index + 1}</td>
             <td class="py-2 text-gray-300">${pago.folio}</td>
             <td class="py-2 text-green-400 font-semibold">$${pago.importe.toLocaleString()}</td>
             <td class="py-2 text-center">
-                <button class="p-1 text-red-400 hover:bg-red-400/10 rounded" title="Eliminar pago">
+                <button class="p-1 text-red-400 hover:bg-red-400/10 rounded btn-eliminar-pago" 
+                        data-pago-id="${pago.id}" title="Eliminar pago">
                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                 </button>
             </td>
@@ -675,21 +782,63 @@ const cargarHistorialPagosMembresia = () => {
 const registrarNuevoPago = (formData) => {
     const nuevoPago = {
         id: `pago_${socioSeleccionado.id}_${Date.now()}`,
-        fecha: new Date(),
+        socioId: socioSeleccionado.id,
+        membresiaId: membresiaSeleccionadaPago.id,
+        fecha: new Date().toISOString(),
         importe: parseFloat(formData.get('importe-pago')),
         folio: formData.get('folio-pago') || `F${Math.floor(Math.random() * 10000)}`,
         tipo: formData.get('tipo-pago'),
         observaciones: formData.get('observacion-pago') || ''
     };
 
-    // Agregar el pago a la membresía
-    membresiaSeleccionadaPago.pagos.push(nuevoPago);
+    console.log('💰 Registrando nuevo pago:', nuevoPago);
 
-    // Actualizar estado del socio
-    const totalPagado = membresiaSeleccionadaPago.pagos.reduce((sum, pago) => sum + pago.importe, 0);
-    if (totalPagado >= membresiaSeleccionadaPago.precio) {
-        socioSeleccionado.estado = 'activo';
+    // Guardar pago en localStorage
+    const pagosJSON = localStorage.getItem('hexodus_pagos');
+    let pagos = pagosJSON ? JSON.parse(pagosJSON) : [];
+    pagos.push(nuevoPago);
+    localStorage.setItem('hexodus_pagos', JSON.stringify(pagos));
+
+    // Calcular total pagado usando el precio real
+    const pagosMembresia = pagos.filter(p => p.membresiaId === membresiaSeleccionadaPago.id);
+    const totalPagado = pagosMembresia.reduce((sum, pago) => sum + pago.importe, 0);
+    const precioReal = membresiaSeleccionadaPago.precioReal || membresiaSeleccionadaPago.precio;
+    
+    console.log(`💵 Total pagado: $${totalPagado} de $${precioReal}`);
+
+    // Actualizar estado del socio en todosLosSocios y localStorage
+    const estadoReal = calcularEstadoRealSocio(socioSeleccionado.id);
+    socioSeleccionado.estado = estadoReal;
+    
+    const indexSocio = todosLosSocios.findIndex(s => s.id === socioSeleccionado.id);
+    if (indexSocio !== -1) {
+        todosLosSocios[indexSocio].estado = estadoReal;
     }
+    
+    localStorage.setItem('hexodus_socios', JSON.stringify(todosLosSocios));
+    console.log(`📊 Estado actualizado a: ${estadoReal}`);
+
+    // Actualizar información del modal en tiempo real
+    document.getElementById('pago-total-pagado').textContent = `$${totalPagado.toLocaleString()} MXN`;
+    
+    // Actualizar estado de pago en tiempo real
+    const estadoPagoDisplay = document.getElementById('estado-pago-display');
+    const estadoPagoReal = totalPagado >= precioReal ? 'pagada' : totalPagado > 0 ? 'parcial' : 'pendiente';
+    
+    if (estadoPagoReal === 'pagada') {
+        estadoPagoDisplay.className = 'mt-3 p-2 rounded text-center bg-green-600/20 text-green-400';
+        estadoPagoDisplay.innerHTML = '<span class="font-semibold">✅ Pagada</span>';
+    } else if (estadoPagoReal === 'parcial') {
+        estadoPagoDisplay.className = 'mt-3 p-2 rounded text-center bg-yellow-600/20 text-yellow-400';
+        estadoPagoDisplay.innerHTML = '<span class="font-semibold">⚠️ Pago Parcial</span>';
+    } else {
+        estadoPagoDisplay.className = 'mt-3 p-2 rounded text-center bg-red-600/20 text-red-400';
+        estadoPagoDisplay.innerHTML = '<span class="font-semibold">❌ Pendiente de Pago</span>';
+    }
+    
+    // Actualizar membresiaSeleccionadaPago con los nuevos datos
+    membresiaSeleccionadaPago.totalPagado = totalPagado;
+    membresiaSeleccionadaPago.estadoPago = estadoPagoReal;
 
     // Refrescar vistas
     cargarHistorialPagosMembresia();
@@ -792,8 +941,14 @@ document.getElementById('btn-agregar-membresia').addEventListener('click', () =>
 
 document.getElementById('btn-registrar-pago').addEventListener('click', () => {
     if (socioSeleccionado) {
-        const membresiaActual = generarDatosPagosSimulados(socioSeleccionado.id)[0];
-        abrirModalRegistrarPago(membresiaActual.id);
+        const historial = obtenerHistorialMembresias(socioSeleccionado.id);
+        if (historial.length > 0) {
+            // Obtener membresía activa (la más reciente)
+            const membresiaActual = historial[0];
+            abrirModalRegistrarPago(membresiaActual.id);
+        } else {
+            mostrarNotificacion('❌ No se encontró membresía activa', 'error');
+        }
     }
 });
 
@@ -914,6 +1069,21 @@ const closeModal = () => {
     modal.classList.add('hidden');
     document.body.style.overflow = '';
     formNuevoSocio.reset();
+    
+    // Resetear preview de foto facial
+    const preview = document.getElementById('preview-foto-socio');
+    preview.innerHTML = '<i data-lucide="user" class="w-8 h-8 text-gray-600"></i>';
+    
+    const estadoCaptura = document.getElementById('estado-captura-facial');
+    estadoCaptura.textContent = 'Sin captura';
+    estadoCaptura.className = 'text-xs text-gray-500 mt-1';
+    
+    // Limpiar datos de captura
+    faceDescriptorCapturado = null;
+    fotoCapturada = null;
+    
+    // Reinicializar iconos
+    setTimeout(() => lucide.createIcons(), 100);
 };
 
 btnCerrar.addEventListener('click', closeModal);
@@ -948,15 +1118,39 @@ formNuevoSocio.addEventListener('submit', (e) => {
         membresiaInfo: membresiaInfo,
         fechaVencimiento: calcularFechaVencimiento(formData.get('fecha-inicio'), membresiaInfo),
         estado: 'activo',
-        fechaIngreso: new Date(formData.get('fecha-inicio'))
+        fechaIngreso: new Date(formData.get('fecha-inicio')),
+        // Datos faciales para reconocimiento
+        faceDescriptor: faceDescriptorCapturado || null,
+        foto: fotoCapturada || null
     };
+    
+    console.log('📝 Registrando nuevo socio:');
+    console.log(`  • Nombre: ${nuevoSocio.nombre}`);
+    console.log(`  • ID: ${nuevoSocio.id}`);
+    console.log(`  • Membresía: ${membresiaInfo.nombre}`);
+    console.log(`  • Fecha Vencimiento: ${nuevoSocio.fechaVencimiento}`);
+    console.log(`  • Estado: ${nuevoSocio.estado}`);
+    console.log(`  • Face Descriptor: ${faceDescriptorCapturado ? 'SÍ (' + faceDescriptorCapturado.length + ' valores)' : 'NO'}`);
+    console.log(`  • Foto: ${fotoCapturada ? 'SÍ' : 'NO'}`);
     
     // Agregar al array de socios
     todosLosSocios.unshift(nuevoSocio);
+    
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('hexodus_socios', JSON.stringify(todosLosSocios));
+    console.log(`✅ Guardado en localStorage - Total socios: ${todosLosSocios.length}`);
+    
     aplicarFiltros(); // Refresh tabla con filtros actuales
     
     // Mostrar mensaje de éxito
-    mostrarNotificacion(`✅ Socio registrado con membresía ${membresiaInfo.nombre}`, 'success');
+    const mensajeExito = faceDescriptorCapturado 
+        ? `✅ Socio registrado con membresía ${membresiaInfo.nombre} y reconocimiento facial` 
+        : `✅ Socio registrado con membresía ${membresiaInfo.nombre}`;
+    mostrarNotificacion(mensajeExito, 'success');
+    
+    // Limpiar datos de captura facial
+    faceDescriptorCapturado = null;
+    fotoCapturada = null;
     
     closeModal();
 });
@@ -1026,12 +1220,222 @@ backdrop.addEventListener('click', () => {
 });
 
 // -----------------------------------------------------------
+// CAPTURA FACIAL PARA RECONOCIMIENTO
+// -----------------------------------------------------------
+
+let faceApiCargado = false;
+let streamCaptura = null;
+let faceDescriptorCapturado = null;
+let fotoCapturada = null;
+
+// Cargar modelos de face-api.js
+async function cargarModelosFaceAPI() {
+    if (faceApiCargado) return true;
+    
+    try {
+        const modelPath = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+        await faceapi.nets.tinyFaceDetector.loadFromUri(modelPath);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(modelPath);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(modelPath);
+        
+        faceApiCargado = true;
+        console.log('✅ Modelos de face-api.js cargados correctamente');
+        return true;
+    } catch (error) {
+        console.error('❌ Error cargando modelos de face-api.js:', error);
+        mostrarNotificacion('Error cargando sistema de reconocimiento facial', 'error');
+        return false;
+    }
+}
+
+// Abrir modal de captura facial
+document.getElementById('btn-capturar-rostro').addEventListener('click', async () => {
+    const modal = document.getElementById('modal-captura-facial');
+    modal.classList.remove('hidden');
+    
+    // Cargar modelos si no están cargados
+    const cargado = await cargarModelosFaceAPI();
+    if (!cargado) {
+        modal.classList.add('hidden');
+        return;
+    }
+    
+    // Activar cámara
+    await activarCamaraCaptura();
+    
+    // Iniciar detección
+    iniciarDeteccionRostro();
+    
+    // Reiniciar iconos
+    setTimeout(() => lucide.createIcons(), 100);
+});
+
+// Activar cámara para captura
+async function activarCamaraCaptura() {
+    const video = document.getElementById('video-captura-facial');
+    
+    try {
+        streamCaptura = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                facingMode: 'user'
+            },
+            audio: false
+        });
+        
+        video.srcObject = streamCaptura;
+        await video.play();
+        
+        console.log('✅ Cámara activada para captura facial');
+    } catch (error) {
+        console.error('❌ Error activando cámara:', error);
+        mostrarNotificacion('No se pudo acceder a la cámara', 'error');
+    }
+}
+
+// Iniciar detección de rostro
+async function iniciarDeteccionRostro() {
+    const video = document.getElementById('video-captura-facial');
+    const mensajeDeteccion = document.getElementById('mensaje-deteccion');
+    const overlayDeteccion = document.getElementById('overlay-deteccion');
+    const btnConfirmar = document.getElementById('btn-confirmar-captura');
+    
+    const detectarRostro = async () => {
+        if (!video.srcObject) return;
+        
+        try {
+            const detecciones = await faceapi
+                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({
+                    inputSize: 416,
+                    scoreThreshold: 0.5
+                }))
+                .withFaceLandmarks()
+                .withFaceDescriptor();
+            
+            if (detecciones) {
+                // Rostro detectado
+                mensajeDeteccion.textContent = '✓ Rostro detectado correctamente';
+                mensajeDeteccion.className = 'text-xs text-green-400 mt-1';
+                overlayDeteccion.querySelector('div').style.borderColor = 'var(--color-verde-exito)';
+                
+                // Almacenar descriptor y capturar foto
+                faceDescriptorCapturado = Array.from(detecciones.descriptor);
+                await capturarFotoSocio();
+                
+                // Habilitar botón de confirmar
+                btnConfirmar.disabled = false;
+                btnConfirmar.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnConfirmar.classList.add('hover:bg-red-600');
+                
+            } else {
+                // No hay rostro
+                mensajeDeteccion.textContent = 'Esperando detección...';
+                mensajeDeteccion.className = 'text-xs text-gray-400 mt-1';
+                overlayDeteccion.querySelector('div').style.borderColor = 'var(--color-azul-acento)';
+                
+                btnConfirmar.disabled = true;
+                btnConfirmar.classList.add('opacity-50', 'cursor-not-allowed');
+                btnConfirmar.classList.remove('hover:bg-red-600');
+            }
+            
+            // Continuar detección cada 500ms
+            setTimeout(detectarRostro, 500);
+            
+        } catch (error) {
+            console.error('Error en detección:', error);
+            setTimeout(detectarRostro, 500);
+        }
+    };
+    
+    detectarRostro();
+}
+
+// Capturar foto del socio
+async function capturarFotoSocio() {
+    const video = document.getElementById('video-captura-facial');
+    const canvas = document.getElementById('canvas-captura-facial');
+    
+    // Configurar canvas al tamaño del video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Dibujar frame del video en canvas
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convertir a base64
+    fotoCapturada = canvas.toDataURL('image/jpeg', 0.9);
+    
+    console.log('✅ Foto capturada correctamente');
+}
+
+// Confirmar captura y cerrar modal
+document.getElementById('btn-confirmar-captura').addEventListener('click', () => {
+    if (!faceDescriptorCapturado || !fotoCapturada) {
+        mostrarNotificacion('No se ha capturado un rostro válido', 'error');
+        return;
+    }
+    
+    // Actualizar preview en formulario
+    const preview = document.getElementById('preview-foto-socio');
+    preview.innerHTML = `<img src="${fotoCapturada}" class="w-full h-full object-cover" />`;
+    
+    // Actualizar estado
+    const estadoCaptura = document.getElementById('estado-captura-facial');
+    estadoCaptura.textContent = '✓ Rostro capturado correctamente';
+    estadoCaptura.className = 'text-xs text-green-400 mt-1';
+    
+    // Cerrar modal y detener cámara
+    cerrarModalCaptura();
+    
+    mostrarNotificacion('Rostro capturado correctamente', 'exito');
+});
+
+// Cancelar captura
+document.getElementById('btn-cancelar-captura').addEventListener('click', () => {
+    cerrarModalCaptura();
+});
+
+document.getElementById('btn-cerrar-modal-facial').addEventListener('click', () => {
+    cerrarModalCaptura();
+});
+
+// Función para cerrar modal de captura
+function cerrarModalCaptura() {
+    const modal = document.getElementById('modal-captura-facial');
+    modal.classList.add('hidden');
+    
+    // Detener stream de cámara
+    if (streamCaptura) {
+        streamCaptura.getTracks().forEach(track => track.stop());
+        streamCaptura = null;
+    }
+    
+    // Limpiar video
+    const video = document.getElementById('video-captura-facial');
+    video.srcObject = null;
+    
+    // Resetear estado del botón
+    const btnConfirmar = document.getElementById('btn-confirmar-captura');
+    btnConfirmar.disabled = true;
+    btnConfirmar.classList.add('opacity-50', 'cursor-not-allowed');
+    btnConfirmar.classList.remove('hover:bg-red-600');
+}
+
+// -----------------------------------------------------------
 // INICIALIZACIÓN
 // -----------------------------------------------------------
 
 // Generar datos simulados y configurar la tabla inicial
 generateMockData();
 sociosFiltrados = [...todosLosSocios];
+
+// Crear membresías iniciales para todos los socios que no las tengan
+console.log('🔄 Verificando membresías iniciales...');
+todosLosSocios.forEach(socio => {
+    crearMembresiaInicial(socio);
+});
 
 // Cargar membresías en el formulario de registro y filtros
 popularSelectMembresias('tipo-membresia');
