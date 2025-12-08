@@ -650,7 +650,7 @@ Sí, después de 2 meses: $800 MXN/mes (soporte + updates).
 - [ ] 3 pagos
 
 **Extras Solicitados:**
-- [ ] Dominio personalizado (+$300/año)
+- [ ] Dominio personalizado (+$800/año)
 - [ ] _________________________________
 - [ ] _________________________________
 
