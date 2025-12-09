@@ -49,8 +49,8 @@
                     </a>
                     <!-- Anclaje al rejistro de entradas de los socios al gimnasio -->
                     <a href="registro.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
-                        <i data-lucide="laptop-minimal-check" class="w-5 h-5 mr-3"></i>
-                        Registro
+                        <i data-lucide="scan-face" class="w-5 h-5 mr-3"></i>
+                        Control de Asistencia
                     </a>
                     <a href="ventas.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
                         <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
@@ -59,6 +59,10 @@
                     <a href="inventario.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
                         <i data-lucide="package" class="w-5 h-5 mr-3"></i>
                         Inventario y Productos
+                    </a>
+                    <a href="movimientos.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
+                        <i data-lucide="trending-up" class="w-5 h-5 mr-3"></i>
+                        Control de Movimientos
                     </a>
                     <a href="reportes.html" class="nav-link flex items-center p-3 rounded-lg text-sm font-medium text-gray-400">
                         <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
@@ -468,13 +472,13 @@
 
     <!-- MODAL DE AGREGAR NUEVO SOCIO  -->
     <div id="modal-agregar-socio" class="fixed inset-0 hidden modal-fondo z-50 overflow-y-auto">
-        <div class="flex items-start justify-center min-h-screen pt-12 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="flex items-start justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
                 <div class="absolute inset-0"></div>
             </div>
 
             <!-- Contenido del Modal -->
-            <div class="inline-block tarjeta modal-contenido overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-xl sm:w-full my-8 text-left">
+            <div class="inline-block tarjeta modal-contenido shadow-xl transform transition-all sm:align-middle sm:max-w-xl sm:w-full my-8 text-left max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-700">
                         <h3 class="text-2xl font-bold" style="color: var(--color-rojo-principal);">
@@ -592,10 +596,10 @@
 
             <!-- Contenido del Modal -->
             <div class="inline-block tarjeta modal-contenido overflow-hidden shadow-xl transform transition-all sm:max-w-2xl sm:w-full text-left">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-700">
-                        <h3 class="text-2xl font-bold" style="color: var(--color-rojo-principal);">
-                            <i data-lucide="scan-face" class="inline w-6 h-6 mr-2"></i> Captura Facial para Acceso
+                <div class="p-5">
+                    <div class="flex justify-between items-center mb-4 border-b pb-3 border-gray-700">
+                        <h3 class="text-xl font-bold" style="color: var(--color-rojo-principal);">
+                            <i data-lucide="scan-face" class="inline w-5 h-5 mr-2"></i> Captura Facial para Acceso
                         </h3>
                         <button id="btn-cerrar-modal-facial" class="text-gray-400 hover:text-white transition duration-200">
                             <i data-lucide="x" class="w-6 h-6"></i>
@@ -603,8 +607,8 @@
                     </div>
 
                     <!-- Video para captura -->
-                    <div class="mb-6">
-                        <div class="relative bg-gray-900 rounded-lg overflow-hidden border-2 border-gray-700" style="aspect-ratio: 4/3;">
+                    <div class="mb-4">
+                        <div class="relative bg-gray-900 rounded-lg overflow-hidden border-2 border-gray-700" style="height: 380px;">
                             <video id="video-captura-facial" autoplay playsinline class="w-full h-full object-cover"></video>
                             <canvas id="canvas-captura-facial" class="hidden"></canvas>
                             
@@ -616,13 +620,13 @@
                             <!-- Estado de detección -->
                             <div id="estado-deteccion" class="absolute top-4 left-4 right-4 bg-gray-900 bg-opacity-90 rounded-lg px-4 py-2 text-center">
                                 <p class="text-sm font-semibold text-white">Posiciona tu rostro en el círculo</p>
-                                <p id="mensaje-deteccion" class="text-xs text-gray-400 mt-1">Esperando detección...</p>
+                                <p id="mensaje-deteccion" class="text-xs text-gray-400 mt-1">✓ Rostro detectado correctamente</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Instrucciones -->
-                    <div class="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+                    <div class="bg-gray-800 rounded-lg p-3 mb-4 border border-gray-700">
                         <h4 class="text-sm font-semibold mb-2 text-gray-300 flex items-center">
                             <i data-lucide="info" class="w-4 h-4 mr-2 text-blue-400"></i> Instrucciones
                         </h4>
