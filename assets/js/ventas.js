@@ -446,6 +446,18 @@ formNuevaVenta.addEventListener('submit', (e) => {
     todasLasVentas.unshift(nuevaVenta);
     aplicarFiltros(); // Refresh tabla con filtros actuales
     
+    // 💰 Registrar movimiento automático (ingreso)
+    if (window.registrarMovimientoAutomatico) {
+        window.registrarMovimientoAutomatico({
+            tipo: 'ingreso',
+            concepto: `Venta - ${nuevaVenta.cliente}`,
+            total: nuevaVenta.total,
+            tipoPago: nuevaVenta.metodoPago,
+            observaciones: `Venta #${nuevaVenta.id}. Productos: ${productosSeleccionados.length}`,
+            origen: 'ventas'
+        });
+    }
+    
     // Mostrar mensaje de éxito
     mostrarNotificacion('✅ Venta registrada exitosamente', 'success');
     
