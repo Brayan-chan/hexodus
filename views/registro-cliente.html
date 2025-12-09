@@ -173,6 +173,12 @@
                 <h1 class="text-5xl font-bold tracking-widest" style="color: var(--color-rojo-principal);">HEXODUS</h1>
             </div>
             <p class="text-gray-400 mt-2 text-lg">Sistema de Reconocimiento Facial</p>
+            
+            <!-- Indicador de Audio -->
+            <div id="audio-status" class="mt-4 flex items-center justify-center gap-2 text-sm" style="display: none;">
+                <i data-lucide="volume-2" class="w-4 h-4"></i>
+                <span>Audio listo</span>
+            </div>
         </div>
         
         <!-- Contenido Principal -->
@@ -191,20 +197,32 @@
                         <div class="scan-line"></div>
                     </div>
 
-                    <!-- Mensaje de Estado Inicial -->
-                    <div id="estado-inicial" class="absolute inset-0 flex items-center justify-center" style="background: rgba(10, 14, 39, 0.7);">
-                        <div class="estado-inicial">
-                            <i data-lucide="scan-face" class="w-32 h-32 mx-auto mb-6" style="color: var(--color-azul-acento);"></i>
-                            <h2>Acércate al Escáner</h2>
-                            <p>Posiciona tu rostro frente a la cámara</p>
-                            <div class="mt-8 flex items-center justify-center gap-3">
-                                <div class="w-4 h-4 rounded-full bg-blue-500 animate-pulse"></div>
-                                <span class="text-xl text-gray-400">Esperando...</span>
-                            </div>
-                        </div>
+            <!-- Mensaje de Estado Inicial -->
+            <div id="estado-inicial" class="absolute inset-0 flex items-center justify-center" style="background: rgba(10, 14, 39, 0.7);">
+                <div class="estado-inicial">
+                    <i data-lucide="scan-face" class="w-32 h-32 mx-auto mb-6" style="color: var(--color-azul-acento);"></i>
+                    <h2>Acércate al Escáner</h2>
+                    <p>Posiciona tu rostro frente a la cámara</p>
+                    <div class="mt-8 flex items-center justify-center gap-3">
+                        <div class="w-4 h-4 rounded-full bg-blue-500 animate-pulse"></div>
+                        <span class="text-xl text-gray-400">Esperando...</span>
                     </div>
-                    
-                    <!-- Mensaje de Cargando -->
+                </div>
+            </div>
+            
+            <!-- Botón de Activación Inicial (para desbloquear audio) -->
+            <div id="boton-activacion" class="absolute inset-0 flex items-center justify-center" style="background: rgba(10, 14, 39, 0.95); z-index: 200;">
+                <div class="text-center">
+                    <i data-lucide="volume-2" class="w-24 h-24 mx-auto mb-6 animate-pulse" style="color: var(--color-azul-acento);"></i>
+                    <h2 class="text-4xl font-bold mb-4" style="color: var(--color-texto-claro);">Sistema Listo</h2>
+                    <p class="text-xl text-gray-400 mb-8">Presiona el botón para activar el sistema</p>
+                    <button id="btn-activar-sistema" class="px-12 py-6 text-2xl font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl" style="background: linear-gradient(135deg, var(--color-rojo-principal), var(--color-azul-acento)); color: white; box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);">
+                        <i data-lucide="play-circle" class="w-8 h-8 inline mr-3"></i>
+                        ACTIVAR SISTEMA
+                    </button>
+                    <p class="text-sm text-gray-500 mt-6">Esto habilitará el audio y el reconocimiento facial</p>
+                </div>
+            </div>                    <!-- Mensaje de Cargando -->
                     <div id="mensaje-cargando" class="absolute inset-0 flex items-center justify-center" style="background: rgba(10, 14, 39, 0.9); display: none;">
                         <div class="text-center">
                             <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 mb-4" style="border-color: var(--color-azul-acento);"></div>
