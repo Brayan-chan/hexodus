@@ -921,6 +921,18 @@ const procesarCompra = () => {
     // Agregar a lista de compras
     comprasRealizadas.push(nuevaCompra);
     
+    // 💰 Registrar movimiento automático (egreso)
+    if (window.registrarMovimientoAutomatico) {
+        window.registrarMovimientoAutomatico({
+            tipo: 'egreso',
+            concepto: `Compra de inventario - ${proveedor}`,
+            total: totalCompra,
+            tipoPago: tipoPago,
+            observaciones: `Compra #${nuevaCompra.id}. Productos: ${productosEnCompra.length}. Proveedor: ${proveedor}`,
+            origen: 'inventario'
+        });
+    }
+    
     // Actualizar stock de productos
     productosEnCompra.forEach(productoCompra => {
         const producto = todosLosProductos.find(p => p.id == productoCompra.id);
