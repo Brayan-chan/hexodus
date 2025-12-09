@@ -73,3 +73,37 @@ body {
     background-color: var(--color-fondo-oscuro);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+/* Estilos para la lista de visitantes */
+#lista-visitantes {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 191, 255, 0.3) rgba(28, 28, 32, 0.5);
+}
+
+#lista-visitantes::-webkit-scrollbar {
+    width: 8px;
+}
+
+#lista-visitantes::-webkit-scrollbar-track {
+    background: rgba(28, 28, 32, 0.5);
+    border-radius: 4px;
+}
+
+#lista-visitantes::-webkit-scrollbar-thumb {
+    background: rgba(0, 191, 255, 0.3);
+    border-radius: 4px;
+}
+
+#lista-visitantes::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 191, 255, 0.5);
+}
+
+.bg-gray-750 {
+    background-color: #2A2A32;
+}
+
+/* Animación para refrescar */
+#refrescar-visitantes:active {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
