@@ -142,3 +142,161 @@ new Chart(ctxConcurrencia, {
         }
     }
 });
+
+// -----------------------------------------------------------
+// 4. Lógica de Visitantes del Día
+// -----------------------------------------------------------
+
+// Función para obtener registros de acceso desde localStorage
+const obtenerRegistrosAcceso = () => {
+    const registrosJSON = localStorage.getItem('registros_acceso');
+    return registrosJSON ? JSON.parse(registrosJSON) : [];
+};
+
+// Función para obtener socios desde localStorage
+const obtenerSocios = () => {
+    const sociosJSON = localStorage.getItem('hexodus_socios');
+    return sociosJSON ? JSON.parse(sociosJSON) : [];
+};
+
+// Función para cargar y mostrar visitantes del día
+const cargarVisitantesDelDia = () => {
+    const registros = obtenerRegistrosAcceso();
+    const socios = obtenerSocios();
+    const container = document.getElementById('lista-visitantes');
+    const contador = document.getElementById('total-visitantes-hoy');
+    
+    // Filtrar registros del día actual
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    const registrosHoy = registros.filter(r => {
+        const fecha = new Date(r.timestamp);
+        fecha.setHours(0, 0, 0, 0);
+        return fecha.getTime() === hoy.getTime() && r.tipo === 'permitido';
+    });
+    
+    // Agrupar por socioId para evitar duplicados
+    const visitantesUnicos = new Map();
+    registrosHoy.forEach(registro => {
+        if (!visitantesUnicos.has(registro.socioId)) {
+            visitantesUnicos.set(registro.socioId, {
+                socioId: registro.socioId,
+                nombreSocio: registro.nombreSocio,
+                primeraEntrada: new Date(registro.timestamp),
+                ultimaEntrada: new Date(registro.timestamp),
+                totalVisitas: 1
+            });
+        } else {
+            const visitante = visitantesUnicos.get(registro.socioId);
+            visitante.ultimaEntrada = new Date(registro.timestamp);
+            visitante.totalVisitas++;
+        }
+    });
+    
+    // Convertir a array y ordenar por hora de última entrada (más recientes primero)
+    const visitantesArray = Array.from(visitantesUnicos.values())
+        .sort((a, b) => b.ultimaEntrada - a.ultimaEntrada);
+    
+    // Actualizar contador
+    contador.textContent = `${visitantesArray.length} asistencias`;
+    
+    // Renderizar lista
+    if (visitantesArray.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-400 py-8">No hay visitantes registrados hoy</p>';
+        return;
+    }
+    
+    let html = '<div class="space-y-3">';
+    
+    visitantesArray.forEach((visitante, index) => {
+        // Buscar información completa del socio
+        const socio = socios.find(s => s.id === visitante.socioId);
+        const nombreCompleto = socio ? `${socio.nombre} ${socio.apellido}` : visitante.nombreSocio;
+        const membresia = socio ? socio.membresiaInfo?.nombre || 'Sin membresía' : 'Sin membresía';
+        
+        const horaEntrada = visitante.primeraEntrada.toLocaleTimeString('es-ES', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        const horaUltima = visitante.ultimaEntrada.toLocaleTimeString('es-ES', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        // Calcular tiempo transcurrido desde última entrada
+        const tiempoTranscurrido = Math.floor((new Date() - visitante.ultimaEntrada) / (1000 * 60)); // en minutos
+        let estadoPresencia = '';
+        let colorEstado = '';
+        
+        if (tiempoTranscurrido < 120) { // Menos de 2 horas
+            estadoPresencia = '🟢 En el gimnasio';
+            colorEstado = 'text-green-400';
+        } else if (tiempoTranscurrido < 240) { // Entre 2 y 4 horas
+            estadoPresencia = '🟡 Posiblemente salió';
+            colorEstado = 'text-yellow-400';
+        } else {
+            estadoPresencia = '⚪ Salió';
+            colorEstado = 'text-gray-400';
+        }
+        
+        html += `
+            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-800 hover:bg-gray-750 transition duration-200">
+                <div class="flex items-center gap-4">
+                    <!-- Avatar con número -->
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center" 
+                         style="background-color: rgba(0, 191, 255, 0.2);">
+                        <span class="text-sm font-bold" style="color: var(--color-azul-acento);">#${visitante.socioId}</span>
+                    </div>
+                    
+                    <!-- Información del visitante -->
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-semibold text-white">${nombreCompleto}</span>
+                            ${visitante.totalVisitas > 1 ? `
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400">
+                                    ${visitante.totalVisitas} entradas
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div class="text-xs text-gray-400 mt-1">
+                            <span>💳 ${membresia}</span>
+                            <span class="mx-2">•</span>
+                            <span>🕐 Primera entrada: ${horaEntrada}</span>
+                            ${visitante.totalVisitas > 1 ? `
+                                <span class="mx-2">•</span>
+                                <span>Última: ${horaUltima}</span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Estado de presencia -->
+                <div class="text-right">
+                    <p class="text-xs font-semibold ${colorEstado}">${estadoPresencia}</p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Hace ${tiempoTranscurrido < 60 ? tiempoTranscurrido + 'm' : Math.floor(tiempoTranscurrido / 60) + 'h'}
+                    </p>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+    
+    // Reinicializar iconos de Lucide
+    lucide.createIcons();
+};
+
+// Botón para refrescar visitantes
+document.getElementById('refrescar-visitantes').addEventListener('click', () => {
+    cargarVisitantesDelDia();
+});
+
+// Cargar visitantes al inicio
+cargarVisitantesDelDia();
+
+// Actualizar visitantes cada 30 segundos
+setInterval(cargarVisitantesDelDia, 30000);
