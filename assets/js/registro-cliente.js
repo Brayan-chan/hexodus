@@ -24,6 +24,16 @@ let config = {
     tiempoReset: 10
 };
 
+// Precarga de sonidos
+const audioCache = {
+    success: null,
+    warning: null,
+    error: null
+};
+
+// Estado de audio
+let audioDesbloqueado = false;
+
 // =====================================================================
 // INICIALIZACIÓN
 // =====================================================================
@@ -32,6 +42,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('🖥️ Iniciando pantalla de escaneo facial...');
     
     lucide.createIcons();
+    
+    // Precargar sonidos
+    precargarSonidos();
     
     // Cargar configuración desde localStorage
     cargarConfiguracion();
@@ -52,14 +65,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     const cargaExitosa = await cargarModelosFaceAPI();
     
     if (cargaExitosa) {
-        console.log('✅ Modelos cargados - Iniciando cámara...');
+        console.log('✅ Modelos cargados - Esperando activación...');
         mostrarMensajeCargando(false);
         
-        // Activar cámara automáticamente
-        await activarCamara();
+        // Mostrar botón de activación
+        mostrarBotonActivacion();
         
         // Enviar estado a ventana principal
-        enviarEstadoSistema('activo');
+        enviarEstadoSistema('esperando_activacion');
     } else {
         console.error('❌ Error al cargar modelos');
         mostrarError('Error al inicializar el sistema');
@@ -701,12 +714,173 @@ function mostrarError(texto) {
     lucide.createIcons();
 }
 
-function reproducirSonido(tipo) {
-    if (!config.sonidoHabilitado) return;
+function precargarSonidos() {
+    console.log('🔊 Precargando sonidos...');
     
-    // Los sonidos se reproducirían aquí
-    // Por ahora solo un log
-    console.log(`🔊 Sonido: ${tipo}`);
+    try {
+        // Precargar sonido de éxito
+        audioCache.success = new Audio('../assets/sounds/success.wav');
+        audioCache.success.volume = 0.6;
+        audioCache.success.load();
+        
+        // Precargar sonido de advertencia (por ahora usa el mismo)
+        audioCache.warning = new Audio('../assets/sounds/success.wav');
+        audioCache.warning.volume = 0.5;
+        audioCache.warning.load();
+        
+        // Precargar sonido de error (por ahora usa el mismo)
+        audioCache.error = new Audio('../assets/sounds/success.wav');
+        audioCache.error.volume = 0.4;
+        audioCache.error.load();
+        
+        console.log('✅ Sonidos precargados correctamente');
+        
+        // Intentar desbloquear audio con primera interacción
+        desbloquearAudio();
+    } catch (error) {
+        console.error('❌ Error al precargar sonidos:', error);
+    }
+}
+
+function desbloquearAudio() {
+    // Ya no usamos listeners automáticos
+    // El desbloqueo se hace con el botón de activación
+    console.log('⏳ Audio se desbloqueará al presionar botón de activación');
+}
+
+function mostrarBotonActivacion() {
+    const botonContainer = document.getElementById('boton-activacion');
+    const btnActivar = document.getElementById('btn-activar-sistema');
+    
+    if (!botonContainer || !btnActivar) return;
+    
+    botonContainer.style.display = 'flex';
+    lucide.createIcons();
+    
+    // Evento del botón de activación
+    btnActivar.addEventListener('click', async () => {
+        console.log('🎬 Activando sistema...');
+        
+        try {
+            // Desbloquear audio con interacción directa del usuario
+            const promesas = [
+                audioCache.success?.play(),
+                audioCache.warning?.play(),
+                audioCache.error?.play()
+            ].filter(Boolean);
+            
+            await Promise.all(promesas.map(p => p.catch(() => {})));
+            
+            // Pausar inmediatamente
+            audioCache.success?.pause();
+            audioCache.warning?.pause();
+            audioCache.error?.pause();
+            
+            // Reiniciar a posición 0
+            if (audioCache.success) audioCache.success.currentTime = 0;
+            if (audioCache.warning) audioCache.warning.currentTime = 0;
+            if (audioCache.error) audioCache.error.currentTime = 0;
+            
+            audioDesbloqueado = true;
+            console.log('🔓 Audio desbloqueado correctamente mediante botón');
+            
+            // Ocultar botón de activación
+            botonContainer.style.opacity = '0';
+            botonContainer.style.transition = 'opacity 0.5s';
+            setTimeout(() => {
+                botonContainer.style.display = 'none';
+            }, 500);
+            
+            // Mostrar indicador de audio listo
+            mostrarIndicadorAudio(true);
+            
+            // Activar cámara
+            await activarCamara();
+            
+            // Enviar estado a ventana principal
+            enviarEstadoSistema('activo');
+            
+        } catch (error) {
+            console.error('❌ Error al activar sistema:', error);
+        }
+    });
+}
+
+function mostrarIndicadorAudio(mostrar) {
+    const indicador = document.getElementById('audio-status');
+    if (indicador) {
+        indicador.style.display = mostrar ? 'flex' : 'none';
+        indicador.style.color = 'var(--color-azul-acento)';
+        
+        // Animar el indicador brevemente
+        if (mostrar) {
+            indicador.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                // Ocultar después de 3 segundos
+                indicador.style.opacity = '0';
+                indicador.style.transition = 'opacity 1s';
+                setTimeout(() => {
+                    indicador.style.display = 'none';
+                }, 1000);
+            }, 3000);
+        }
+        
+        lucide.createIcons();
+    }
+}
+
+function reproducirSonido(tipo) {
+    if (!config.sonidoHabilitado) {
+        console.log(`🔇 Sonido deshabilitado: ${tipo}`);
+        return;
+    }
+    
+    if (!audioDesbloqueado) {
+        console.warn('⚠️ Audio aún no desbloqueado - presiona el botón de activación primero');
+        return;
+    }
+    
+    try {
+        let audio = null;
+        
+        // Obtener audio del caché
+        switch(tipo) {
+            case 'success':
+                audio = audioCache.success;
+                break;
+            case 'warning':
+                audio = audioCache.warning;
+                break;
+            case 'error':
+                audio = audioCache.error;
+                break;
+            default:
+                console.warn(`⚠️ Tipo de sonido desconocido: ${tipo}`);
+                return;
+        }
+        
+        if (!audio) {
+            console.error(`❌ Audio no encontrado para tipo: ${tipo}`);
+            return;
+        }
+        
+        // Reiniciar el audio si ya se estaba reproduciendo
+        audio.currentTime = 0;
+        
+        // Reproducir audio
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log(`🔊 Reproduciendo sonido: ${tipo}`);
+            }).catch(error => {
+                console.error(`❌ Error al reproducir sonido ${tipo}:`, error);
+            });
+        }
+        
+    } catch (error) {
+        console.error(`❌ Error en reproducirSonido:`, error);
+    }
 }
 
 // =====================================================================
