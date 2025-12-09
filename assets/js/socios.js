@@ -799,6 +799,18 @@ const registrarNuevoPago = (formData) => {
     pagos.push(nuevoPago);
     localStorage.setItem('hexodus_pagos', JSON.stringify(pagos));
 
+    // 💰 Registrar movimiento automático (ingreso)
+    if (window.registrarMovimientoAutomatico) {
+        window.registrarMovimientoAutomatico({
+            tipo: 'ingreso',
+            concepto: `Pago de membresía - ${socioSeleccionado.nombre} ${socioSeleccionado.apellido}`,
+            total: nuevoPago.importe,
+            tipoPago: nuevoPago.tipo,
+            observaciones: `Folio: ${nuevoPago.folio}. Membresía: ${membresiaSeleccionadaPago.planNombre || membresiaSeleccionadaPago.nombre}`,
+            origen: 'socios'
+        });
+    }
+
     // Calcular total pagado usando el precio real
     const pagosMembresia = pagos.filter(p => p.membresiaId === membresiaSeleccionadaPago.id);
     const totalPagado = pagosMembresia.reduce((sum, pago) => sum + pago.importe, 0);
