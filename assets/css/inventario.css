@@ -330,7 +330,7 @@ body {
 }
 
 .tabla-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, var(--color-rojo-principal), var(--color-azul-acento));
+    background: var(--color-azul-acento);
     border-radius: 10px;
     border: 2px solid var(--color-tarjeta-fondo);
 }
