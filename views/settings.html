@@ -148,6 +148,28 @@
                 </div>
             </section>
 
+            <!-- SISTEMA DE TABS PARA CONFIGURACIÓN -->
+            <section class="tabs-container mb-6">
+                <div class="tabs-navigation">
+                    <button class="tab-button active" data-tab="apariencia">
+                        <i data-lucide="palette" class="w-5 h-5"></i>
+                        <span>Apariencia</span>
+                    </button>
+                    <button class="tab-button" data-tab="idioma">
+                        <i data-lucide="globe" class="w-5 h-5"></i>
+                        <span>Idioma y Región</span>
+                    </button>
+                    <button class="tab-button" data-tab="notificaciones">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span>Notificaciones</span>
+                    </button>
+                    <button class="tab-button" data-tab="avanzado">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span>Avanzado</span>
+                    </button>
+                </div>
+            </section>
+
             <!-- CONTENIDO DE CONFIGURACIÓN -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -235,7 +257,7 @@
                 <div class="lg:col-span-2 space-y-6">
                     
                     <!-- CONFIGURACIÓN DE APARIENCIA -->
-                    <div class="tarjeta p-6">
+                    <div class="tarjeta p-6 tab-content" data-tab="apariencia">
                         <div class="flex items-center mb-6">
                             <i data-lucide="palette" class="w-6 h-6 mr-2" style="color: var(--color-azul-acento);"></i>
                             <h2 class="text-xl font-semibold">Apariencia y Tema</h2>
@@ -312,7 +334,7 @@
                     </div>
 
                     <!-- CONFIGURACIÓN DE IDIOMA Y REGIÓN -->
-                    <div class="tarjeta p-6">
+                    <div class="tarjeta p-6 tab-content hidden" data-tab="idioma">
                         <div class="flex items-center mb-6">
                             <i data-lucide="globe" class="w-6 h-6 mr-2" style="color: var(--color-azul-acento);"></i>
                             <h2 class="text-xl font-semibold">Idioma y Localización</h2>
@@ -357,7 +379,7 @@
                     </div>
 
                     <!-- CONFIGURACIÓN DE NOTIFICACIONES -->
-                    <div class="tarjeta p-6">
+                    <div class="tarjeta p-6 tab-content hidden" data-tab="notificaciones">
                         <div class="flex items-center mb-6">
                             <i data-lucide="bell" class="w-6 h-6 mr-2" style="color: var(--color-azul-acento);"></i>
                             <h2 class="text-xl font-semibold">Notificaciones</h2>
@@ -461,7 +483,7 @@
                     </div>
 
                     <!-- CONFIGURACIÓN AVANZADA -->
-                    <div class="tarjeta p-6">
+                    <div class="tarjeta p-6 tab-content hidden" data-tab="avanzado">
                         <div class="flex items-center mb-6">
                             <i data-lucide="cog" class="w-6 h-6 mr-2" style="color: var(--color-azul-acento);"></i>
                             <h2 class="text-xl font-semibold">Configuración Avanzada</h2>
