@@ -90,7 +90,6 @@ body {
 }
 
 .membresia-card:hover {
-    transform: translateY(-4px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     border-color: var(--color-azul-acento);
 }
@@ -102,7 +101,8 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--color-rojo-principal), var(--color-azul-acento));
+    background: var(--color-azul-acento);
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.6);
 }
 
 /* Header de la tarjeta de membresía */
@@ -362,7 +362,7 @@ input[type="checkbox"]:checked {
 }
 
 .contenido-scrollable::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, var(--color-rojo-principal), var(--color-azul-acento));
+    background: var(--color-azul-acento);
     border-radius: 10px;
 }
 
