@@ -91,7 +91,7 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--color-rojo-principal), var(--color-azul-acento));
+    background: var(--color-azul-acento);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.3s ease;
@@ -194,7 +194,7 @@ body {
 }
 
 .tabla-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, var(--color-rojo-principal), var(--color-azul-acento));
+    background: var(--color-azul-acento);
     border-radius: 10px;
     border: 2px solid var(--color-tarjeta-fondo);
 }
@@ -405,7 +405,8 @@ body {
 
 .progress-reporte .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-rojo-principal), var(--color-azul-acento));
+    background: var(--color-azul-acento);
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.6);
     transition: width 0.3s ease;
 }
 
