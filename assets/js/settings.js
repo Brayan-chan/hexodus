@@ -425,7 +425,54 @@ const restablecerConfiguracion = () => {
 // -----------------------------------------------------------
 // FUNCIONES DE MANEJO DE EVENTOS
 // -----------------------------------------------------------
+
+// Función para configurar el sistema de tabs
+const configurarTabs = () => {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabName = button.getAttribute('data-tab');
+            
+            // Remover clase active de todos los botones
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Agregar clase active al botón clickeado
+            button.classList.add('active');
+            
+            // Ocultar todo el contenido
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Mostrar el contenido correspondiente
+            const activeContent = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+            
+            // Guardar tab activo en localStorage
+            localStorage.setItem('hexodus_active_tab', tabName);
+            
+            console.log(`📑 Tab cambiado a: ${tabName}`);
+        });
+    });
+    
+    // Restaurar tab activo desde localStorage
+    const savedTab = localStorage.getItem('hexodus_active_tab');
+    if (savedTab) {
+        const savedButton = document.querySelector(`.tab-button[data-tab="${savedTab}"]`);
+        if (savedButton) {
+            savedButton.click();
+        }
+    }
+};
+
 const configurarEventListeners = () => {
+    // Sistema de tabs
+    configurarTabs();
+    
     // Botones principales
     document.getElementById('btn-guardar-configuracion').addEventListener('click', guardarConfiguracion);
     document.getElementById('btn-restablecer-configuracion').addEventListener('click', restablecerConfiguracion);
